@@ -1,24 +1,32 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import PlantCard from '../components/PlantCard.jsx';
 import { clearSession, request } from '../api/client.js';
 import '../styles/dashboard.css';
 
-const categories = ['all', 'Immunity', 'Digestive', 'Respiratory', 'Brain Tonic', 'Anti-inflammatory', 'Skin Care', 'Adaptogen'];
+const sidebarCategories = [
+  { id: 'roots', label: 'Roots & Rhizomes', icon: 'fas fa-seedling', category: 'Root' },
+  { id: 'leaves', label: 'Leaves & Herbs', icon: 'fas fa-leaf', category: 'Herb' },
+  { id: 'flowers', label: 'Flowers & Buds', icon: 'fas fa-spa', category: 'Flower' },
+  { id: 'seeds', label: 'Seeds & Fruits', icon: 'fas fa-apple-alt', category: 'Seed' },
+  { id: 'bark', label: 'Bark & Wood', icon: 'fas fa-tree', category: 'Tree' },
+];
 
 const DashboardPage = ({ user, onUserChange }) => {
   const [plants, setPlants] = useState([]);
   const [favorites, setFavorites] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [category, setCategory] = useState('all');
+  const [activeCategory, setActiveCategory] = useState(null);
+  const [activeSidebar, setActiveSidebar] = useState('browse');
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const isFavorite = (plantId) => favorites.some((fav) => (fav._id || fav.id) === plantId);
 
   const fetchPlants = async (opts = {}) => {
     const params = new URLSearchParams();
     if (opts.search) params.append('search', opts.search);
-    if (opts.category && opts.category !== 'all') params.append('category', opts.category);
+    if (opts.category) params.append('category', opts.category);
     const query = params.toString();
     const data = await request(`/plants${query ? `?${query}` : ''}`);
     setPlants(data);
@@ -44,13 +52,21 @@ const DashboardPage = ({ user, onUserChange }) => {
 
   const handleSearch = async (value) => {
     setSearchTerm(value);
-    await fetchPlants({ search: value, category });
+    await fetchPlants({ search: value, category: activeCategory });
   };
 
-  const handleCategory = async (cat) => {
-    setCategory(cat);
+  const handleCategoryClick = async (cat) => {
+    setActiveSidebar(cat.id);
+    setActiveCategory(cat.category);
     setSearchTerm('');
-    await fetchPlants({ category: cat });
+    await fetchPlants({ category: cat.category });
+  };
+
+  const handleBrowseAll = async () => {
+    setActiveSidebar('browse');
+    setActiveCategory(null);
+    setSearchTerm('');
+    await fetchPlants();
   };
 
   const toggleFavorite = async (plantId) => {
@@ -74,18 +90,16 @@ const DashboardPage = ({ user, onUserChange }) => {
   const filteredPlants = useMemo(() => plants, [plants]);
 
   return (
-    <div>
+    <div className="dashboard-root">
+      {/* ── HEADER ── */}
       <header className="app-header">
-        <div className="logo">
+        <div className="header-logo">
           <img src="/images/logo-final.png" alt="AyurSphere" />
-          <div>
-            <div style={{ fontWeight: 800 }}>AyurSphere</div>
-            <small style={{ color: 'rgba(255,255,255,0.8)' }}>Virtual herbal garden</small>
-          </div>
+          <span className="header-brand">AyurSphere</span>
         </div>
 
         <div className="search-bar">
-          <i className="fas fa-search" />
+          <i className="fas fa-search search-icon" />
           <input
             placeholder="Search plants, properties, or categories..."
             value={searchTerm}
@@ -93,65 +107,118 @@ const DashboardPage = ({ user, onUserChange }) => {
           />
         </div>
 
-        <div className="actions">
-          <Link to="/favorites" className="secondary">
-            <i className="fas fa-heart" /> Favorites ({favorites.length})
-          </Link>
-          <div className="user">
-            <i className="fas fa-user-circle" /> {user?.username}
-          </div>
-          <button className="secondary" onClick={logout}>Logout</button>
+        <div className="header-actions">
+          <button className="header-icon-btn" onClick={() => navigate('/favorites')}>
+            <i className="fas fa-heart" />
+            {favorites.length > 0 && (
+              <span className="header-badge header-badge--red">{favorites.length}</span>
+            )}
+          </button>
+
+          <button className="header-icon-btn">
+            <i className="fas fa-shopping-cart" />
+            <span className="header-badge header-badge--red">1</span>
+          </button>
+
+          <span className="header-username">{user?.username}</span>
+          <button className="header-logout-btn" onClick={logout}>Logout</button>
         </div>
       </header>
 
+      {/* ── BODY ── */}
       <div className="main-layout">
+        {/* ── SIDEBAR ── */}
         <aside className="sidebar">
-          <h3>Categories</h3>
-          <ul className="category-list">
-            {categories.map((cat) => (
+          <div className="sidebar-section">
+            <p className="sidebar-label">MY LIBRARY</p>
+            <ul className="sidebar-list">
               <li
-                key={cat}
-                className={`category-item ${category === cat ? 'active' : ''}`}
-                onClick={() => handleCategory(cat)}
+                className={`sidebar-item ${activeSidebar === 'browse' ? 'sidebar-item--active' : ''}`}
+                onClick={handleBrowseAll}
               >
-                <i className="fas fa-spa" /> {cat === 'all' ? 'All Plants' : cat}
+                <i className="fas fa-leaf" />
+                <span>Browse All Plants</span>
               </li>
-            ))}
-          </ul>
+              <li
+                className={`sidebar-item ${activeSidebar === 'favorites' ? 'sidebar-item--active' : ''}`}
+                onClick={() => { setActiveSidebar('favorites'); navigate('/favorites'); }}
+              >
+                <i className="far fa-heart" />
+                <span>My Favorites</span>
+              </li>
+              <li
+                className={`sidebar-item ${activeSidebar === 'garden' ? 'sidebar-item--active' : ''}`}
+                onClick={() => setActiveSidebar('garden')}
+              >
+                <i className="fas fa-map-marker-alt" />
+                <span>Virtual Garden</span>
+              </li>
+            </ul>
+          </div>
+
+          <div className="sidebar-section">
+            <p className="sidebar-label">CATEGORIES</p>
+            <ul className="sidebar-list">
+              {sidebarCategories.map((cat) => (
+                <li
+                  key={cat.id}
+                  className={`sidebar-item ${activeSidebar === cat.id ? 'sidebar-item--active' : ''}`}
+                  onClick={() => handleCategoryClick(cat)}
+                >
+                  <i className={cat.icon} />
+                  <span>{cat.label}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </aside>
 
+        {/* ── CONTENT ── */}
         <main className="content">
+          {/* Hero */}
           <section className="hero">
-            <div>
-              <h2>Welcome back, {user?.username || 'explorer'}!</h2>
-              <p>Continue exploring ancient Ayurvedic wisdom.</p>
-              <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.6rem', flexWrap: 'wrap' }}>
-                <span className="badge-soft"><i className="fas fa-heart" /> {favorites.length} favorites</span>
-                <span className="badge-soft"><i className="fas fa-seedling" /> {plants.length} plants</span>
+            <div className="hero-overlay" />
+            <div className="hero-body">
+              <div>
+                <h2 className="hero-title">
+                  Welcome back, <span className="hero-username">{user?.username || 'explorer'}!</span>
+                </h2>
+                <p className="hero-subtitle">Continue exploring the ancient wisdom of Ayurvedic medicine</p>
               </div>
+              <button className="hero-add-btn">
+                <i className="fas fa-plus" /> Add New Plant
+              </button>
             </div>
-            <div className="secondary">Curate and save your medicinal garden</div>
           </section>
 
+          {/* Section heading */}
+          <div className="section-heading">
+            <h3>Featured Medicinal Plants</h3>
+            <p>Discover these powerful healing plants from ancient Ayurvedic traditions</p>
+          </div>
+
+          {/* Plants grid */}
           {loading ? (
-            <div className="card" style={{ padding: '1.2rem' }}>Loading plants...</div>
+            <div className="loading-state">
+              <i className="fas fa-spinner fa-spin" />
+              <span>Loading plants...</span>
+            </div>
+          ) : filteredPlants.length === 0 ? (
+            <div className="empty-state">
+              <i className="fas fa-seedling" />
+              <p>No plants found. Try another search or category.</p>
+            </div>
           ) : (
-            <section>
-              <div className="plants-grid">
-                {filteredPlants.length === 0 ? (
-                  <div className="card" style={{ padding: '1.2rem' }}>No plants found. Try another search or category.</div>
-                ) : (
-                  filteredPlants.map((plant) => (
-                    <PlantCard
-                      key={plant._id || plant.id}
-                      plant={plant}
-                      isFavorite={isFavorite(plant._id || plant.id)}
-                      onToggleFavorite={toggleFavorite}
-                    />
-                  ))
-                )}
-              </div>
-            </section>
+            <div className="plants-grid">
+              {filteredPlants.map((plant) => (
+                <PlantCard
+                  key={plant._id || plant.id}
+                  plant={plant}
+                  isFavorite={isFavorite(plant._id || plant.id)}
+                  onToggleFavorite={toggleFavorite}
+                />
+              ))}
+            </div>
           )}
         </main>
       </div>

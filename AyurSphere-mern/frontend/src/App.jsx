@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import PortalPage from './pages/PortalPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
@@ -8,23 +9,17 @@ import { getUser } from './api/client.js';
 const ProtectedRoute = ({ children }) => {
   const user = getUser();
   if (!user) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/portal" replace />;
   }
   return children;
 };
 
 const App = () => {
-  const navigate = useNavigate();
   const [user, setUser] = useState(getUser());
-
-  useEffect(() => {
-    if (!user) {
-      navigate('/login');
-    }
-  }, [user, navigate]);
 
   return (
     <Routes>
+      <Route path="/portal" element={<PortalPage />} />
       <Route path="/login" element={<LoginPage onAuth={setUser} />} />
       <Route
         path="/"
@@ -42,7 +37,7 @@ const App = () => {
           </ProtectedRoute>
         }
       />
-      <Route path="*" element={<Navigate to="/" />} />
+      <Route path="*" element={<Navigate to="/portal" />} />
     </Routes>
   );
 };
