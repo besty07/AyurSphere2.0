@@ -1,0 +1,23 @@
+.favorites-header h2 { color: var(--green-800); margin-bottom: 0.3rem; }
+.favorites-header p { color: var(--muted); }
+
+.empty {
+  display: grid;
+  place-items: center;
+  gap: 0.6rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  border: 1px solid #e1eadb;
+}
+
+.browse-btn {
+  background: linear-gradient(135deg, var(--green-800), var(--green-600));
+  color: white;
+  padding: 0.8rem 1.2rem;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+}

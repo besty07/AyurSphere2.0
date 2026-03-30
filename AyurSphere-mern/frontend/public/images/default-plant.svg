@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="260" viewBox="0 0 400 260" fill="none">
+  <rect width="400" height="260" rx="24" fill="#e8f5e9"/>
+  <path d="M200 70c-22 18-38 46-38 76 0 30 16 58 38 76 22-18 38-46 38-76 0-30-16-58-38-76z" fill="#4a7c2c" opacity="0.14"/>
+  <path d="M186 185c0-23 10-46 26-61-8 25-6 52 6 74-15-5-27-7-32-13z" fill="#2d5016" opacity="0.16"/>
+  <circle cx="200" cy="120" r="46" fill="#6b9e3e" opacity="0.18"/>
+  <text x="200" y="135" text-anchor="middle" font-family="Inter, Arial" font-size="20" fill="#2d5016">AyurSphere</text>
+</svg>
