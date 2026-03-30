@@ -125,23 +125,31 @@ const DashboardPage = ({ user, onUserChange }) => {
             <div>
               <h2>Welcome back, {user?.username || 'explorer'}!</h2>
               <p>Continue exploring ancient Ayurvedic wisdom.</p>
+              <div style={{ display: 'flex', gap: '0.6rem', marginTop: '0.6rem', flexWrap: 'wrap' }}>
+                <span className="badge-soft"><i className="fas fa-heart" /> {favorites.length} favorites</span>
+                <span className="badge-soft"><i className="fas fa-seedling" /> {plants.length} plants</span>
+              </div>
             </div>
-            <div className="secondary">{favorites.length} favorites saved</div>
+            <div className="secondary">Curate and save your medicinal garden</div>
           </section>
 
           {loading ? (
-            <div>Loading plants...</div>
+            <div className="card" style={{ padding: '1.2rem' }}>Loading plants...</div>
           ) : (
             <section>
               <div className="plants-grid">
-                {filteredPlants.map((plant) => (
-                  <PlantCard
-                    key={plant._id || plant.id}
-                    plant={plant}
-                    isFavorite={isFavorite(plant._id || plant.id)}
-                    onToggleFavorite={toggleFavorite}
-                  />
-                ))}
+                {filteredPlants.length === 0 ? (
+                  <div className="card" style={{ padding: '1.2rem' }}>No plants found. Try another search or category.</div>
+                ) : (
+                  filteredPlants.map((plant) => (
+                    <PlantCard
+                      key={plant._id || plant.id}
+                      plant={plant}
+                      isFavorite={isFavorite(plant._id || plant.id)}
+                      onToggleFavorite={toggleFavorite}
+                    />
+                  ))
+                )}
               </div>
             </section>
           )}
