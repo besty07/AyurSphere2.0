@@ -16,9 +16,19 @@ const DashboardPage = ({ user, onUserChange }) => {
   const [activeSidebar, setActiveSidebar] = useState('browse');
   const [loading, setLoading] = useState(true);
   const [showAddPlant, setShowAddPlant] = useState(false);
+  const [showGardenModal, setShowGardenModal] = useState(false);
   const [cart, setCart] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
   const navigate = useNavigate();
+
+  const openGardenModal = () => {
+    setActiveSidebar('garden');
+    setShowGardenModal(true);
+  };
+
+  const closeGardenModal = () => {
+    setShowGardenModal(false);
+  };
 
   const plantOfTheDay = useMemo(() => {
     if (!plants || plants.length === 0) return null;
@@ -131,6 +141,17 @@ const DashboardPage = ({ user, onUserChange }) => {
     navigate('/checkout');
   };
 
+  useEffect(() => {
+    const onEscape = (event) => {
+      if (event.key === 'Escape' && showGardenModal) {
+        setShowGardenModal(false);
+      }
+    };
+
+    window.addEventListener('keydown', onEscape);
+    return () => window.removeEventListener('keydown', onEscape);
+  }, [showGardenModal]);
+
   const logout = () => {
     clearSession();
     onUserChange(null);
@@ -148,7 +169,15 @@ const DashboardPage = ({ user, onUserChange }) => {
   const filteredPlants = useMemo(() => {
     const lowerSearch = searchTerm.trim().toLowerCase();
 
+    const excludedNames = new Set(['turmeric not turmeric', 'abc']);
+
     return plants.filter((plant) => {
+      const plantName = (plant.plantName || plant.name || '').trim().toLowerCase();
+      const plantScientific = (plant.scientificName || '').trim().toLowerCase();
+
+      if (excludedNames.has(plantName)) return false;
+      if (plantName === 'turmeric' && plantScientific === 'cc') return false;
+
       const plantCategory = (plant.category || '').trim().toLowerCase();
       const active = (activeCategory || '').trim().toLowerCase();
       const categoryMatch = !active || plantCategory === active;
@@ -257,7 +286,7 @@ const DashboardPage = ({ user, onUserChange }) => {
           font-style: italic;
         }
 
-        .pod-modal-overlay {
+        .pod-modal-overlay, .garden-modal-overlay {
           position: fixed;
           inset: 0;
           background: rgba(0, 0, 0, 0.45);
@@ -266,17 +295,48 @@ const DashboardPage = ({ user, onUserChange }) => {
           justify-content: center;
           z-index: 999;
           padding: 16px;
+          animation: modal-fade 180ms ease;
         }
 
-        .pod-modal {
+        .pod-modal, .garden-modal {
           max-width: 400px;
           width: 100%;
           background: #ffffff;
           border-radius: 12px;
           box-shadow: 0 20px 50px rgba(0,0,0,0.25);
-          padding: 18px;
+          padding: 22px 18px;
           position: relative;
           text-align: center;
+          animation: modal-scale 170ms ease;
+        }
+
+        .garden-modal-icon {
+          font-size: 2rem;
+          margin-bottom: 8px;
+        }
+
+        .garden-modal h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          margin-bottom: 8px;
+        }
+
+        .garden-modal p {
+          margin: 0;
+          color: #3f5a3a;
+          font-weight: 500;
+        }
+
+        .pod-modal-close, .garden-modal-close {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          border: none;
+          background: transparent;
+          color: #555;
+          font-size: 1.25rem;
+          cursor: pointer;
+          padding: 4px;
         }
 
         .pod-modal-close {
@@ -406,7 +466,7 @@ const DashboardPage = ({ user, onUserChange }) => {
               </li>
               <li
                 className={`sidebar-item ${activeSidebar === 'garden' ? 'sidebar-item--active' : ''}`}
-                onClick={() => setActiveSidebar('garden')}
+                onClick={openGardenModal}
               >
                 <i className="fas fa-map-marker-alt" />
                 <span>Virtual Garden</span>
@@ -481,7 +541,7 @@ const DashboardPage = ({ user, onUserChange }) => {
             </div>
           ) : (
             <div className="plants-grid">
-              {filteredPlants.map((plant) => (
+              {[...filteredPlants].reverse().map((plant) => (
                 <PlantCard
                   key={plant._id || plant.id}
                   plant={plant}
@@ -493,6 +553,20 @@ const DashboardPage = ({ user, onUserChange }) => {
           )}
         </main>
       </div>
+
+      {/* Virtual Garden Modal */}
+      {showGardenModal && (
+        <div className="garden-modal-overlay" onClick={closeGardenModal}>
+          <div className="garden-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="garden-modal-close" onClick={closeGardenModal}>
+              ×
+            </button>
+            <div className="garden-modal-icon" aria-hidden="true">🌿</div>
+            <h3>🌱 Virtual Garden</h3>
+            <p>This feature is coming soon</p>
+          </div>
+        </div>
+      )}
 
       {/* Add Plant Modal */}
       <AddPlantModal
