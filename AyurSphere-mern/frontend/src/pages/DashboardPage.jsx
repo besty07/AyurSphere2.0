@@ -4,13 +4,6 @@ import PlantCard from '../components/PlantCard.jsx';
 import { clearSession, request } from '../api/client.js';
 import '../styles/dashboard.css';
 
-const sidebarCategories = [
-  { id: 'roots', label: 'Roots & Rhizomes', icon: 'fas fa-seedling', category: 'Root' },
-  { id: 'leaves', label: 'Leaves & Herbs', icon: 'fas fa-leaf', category: 'Herb' },
-  { id: 'flowers', label: 'Flowers & Buds', icon: 'fas fa-spa', category: 'Flower' },
-  { id: 'seeds', label: 'Seeds & Fruits', icon: 'fas fa-apple-alt', category: 'Seed' },
-  { id: 'bark', label: 'Bark & Wood', icon: 'fas fa-tree', category: 'Tree' },
-];
 
 const DashboardPage = ({ user, onUserChange }) => {
   const [plants, setPlants] = useState([]);
@@ -23,13 +16,13 @@ const DashboardPage = ({ user, onUserChange }) => {
 
   const isFavorite = (plantId) => favorites.some((fav) => (fav._id || fav.id) === plantId);
 
-  const fetchPlants = async (opts = {}) => {
-    const params = new URLSearchParams();
-    if (opts.search) params.append('search', opts.search);
-    if (opts.category) params.append('category', opts.category);
-    const query = params.toString();
-    const data = await request(`/plants${query ? `?${query}` : ''}`);
-    setPlants(data);
+  const fetchPlants = async () => {
+    const data = await request('/plants');
+    const filtered = data.filter((plant) => {
+      const name = (plant.plantName || plant.name || '').trim().toLowerCase();
+      return name !== 'hhhhhh';
+    });
+    setPlants(filtered);
   };
 
   const fetchFavorites = async () => {
@@ -50,23 +43,20 @@ const DashboardPage = ({ user, onUserChange }) => {
     load();
   }, []);
 
-  const handleSearch = async (value) => {
+  const handleSearch = (value) => {
     setSearchTerm(value);
-    await fetchPlants({ search: value, category: activeCategory });
   };
 
-  const handleCategoryClick = async (cat) => {
-    setActiveSidebar(cat.id);
-    setActiveCategory(cat.category);
+  const handleCategoryClick = (categoryValue) => {
+    setActiveSidebar(categoryValue);
+    setActiveCategory(categoryValue);
     setSearchTerm('');
-    await fetchPlants({ category: cat.category });
   };
 
-  const handleBrowseAll = async () => {
+  const handleBrowseAll = () => {
     setActiveSidebar('browse');
     setActiveCategory(null);
     setSearchTerm('');
-    await fetchPlants();
   };
 
   const toggleFavorite = async (plantId) => {
@@ -87,10 +77,68 @@ const DashboardPage = ({ user, onUserChange }) => {
     onUserChange(null);
   };
 
-  const filteredPlants = useMemo(() => plants, [plants]);
+  const categoryOptions = useMemo(() => {
+    const categories = plants
+      .map((p) => (p.category || '').trim())
+      .filter(Boolean);
+
+    const uniqueCategories = Array.from(new Set(categories));
+    return uniqueCategories.slice(0, 10); // limit to max 10 categories
+  }, [plants]);
+
+  const filteredPlants = useMemo(() => {
+    const lowerSearch = searchTerm.trim().toLowerCase();
+
+    return plants.filter((plant) => {
+      const plantCategory = (plant.category || '').trim().toLowerCase();
+      const active = (activeCategory || '').trim().toLowerCase();
+      const categoryMatch = !active || plantCategory === active;
+      if (!categoryMatch) return false;
+
+      if (!lowerSearch) return true;
+
+      const searchTarget = [
+        plant.plantName,
+        plant.scientificName,
+        plant.description,
+        plant.uses,
+        plant.category,
+      ]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+
+      return searchTarget.includes(lowerSearch);
+    });
+  }, [plants, activeCategory, searchTerm]);
+
+
 
   return (
     <div className="dashboard-root">
+      <style>{`
+        @keyframes modal-fade {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        @keyframes modal-scale {
+          from { opacity: 0; transform: scale(0.96); }
+          to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 760px) {
+          .modal-card {
+            grid-template-columns: 1fr !important;
+            max-width: 100% !important;
+          }
+
+          .modal-image-wrapper {
+            max-height: 260px !important;
+          }
+        }
+      `}</style>
+
       {/* ── HEADER ── */}
       <header className="app-header">
         <div className="header-logo">
@@ -159,14 +207,14 @@ const DashboardPage = ({ user, onUserChange }) => {
           <div className="sidebar-section">
             <p className="sidebar-label">CATEGORIES</p>
             <ul className="sidebar-list">
-              {sidebarCategories.map((cat) => (
+              {categoryOptions.map((categoryName) => (
                 <li
-                  key={cat.id}
-                  className={`sidebar-item ${activeSidebar === cat.id ? 'sidebar-item--active' : ''}`}
-                  onClick={() => handleCategoryClick(cat)}
+                  key={categoryName}
+                  className={`sidebar-item ${activeSidebar === categoryName ? 'sidebar-item--active' : ''}`}
+                  onClick={() => handleCategoryClick(categoryName)}
                 >
-                  <i className={cat.icon} />
-                  <span>{cat.label}</span>
+                  <i className="fas fa-leaf" />
+                  <span>{categoryName}</span>
                 </li>
               ))}
             </ul>
