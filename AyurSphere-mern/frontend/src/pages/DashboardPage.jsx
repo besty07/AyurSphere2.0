@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import PlantCard from '../components/PlantCard.jsx';
 import AddPlantModal from '../components/AddPlantModal.jsx';
 import CartPanel from '../components/CartPanel.jsx';
+import VoiceAssistant from '../components/VoiceAssistant.jsx';
 import { clearSession, request } from '../api/client.js';
 import '../styles/dashboard.css';
 
@@ -509,6 +510,9 @@ const DashboardPage = ({ user, onUserChange }) => {
         onRemove={handleCartRemove}
         onCheckout={handleCheckout}
       />
+
+      {/* Voice Assistant Widget */}
+      <VoiceAssistant />
     </div>
   );
 };

@@ -243,21 +243,36 @@ const LandingPage = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         >
+          <motion.img
+            src="/images/logo-final.png"
+            alt="AyurSphere Logo"
+            className="hero-logo"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.8, type: 'spring' }}
+          />
+
           <motion.p
-            style={{ fontSize: '0.85rem', letterSpacing: '4px', textTransform: 'uppercase', color: 'rgba(168,224,99,0.7)', marginBottom: '1rem', fontWeight: 500 }}
+            className="hero-eyebrow"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
           >
-            ✦ Virtual Herbal Garden ✦
+            ✦ VIRTUAL HERBAL GARDEN ✦
           </motion.p>
 
-          <h1 className="hero-title">
-            Welcome to<br />AyurSphere
-          </h1>
+          <motion.h1 
+            className="hero-title hero-title-super"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5, duration: 0.8 }}
+          >
+            Welcome to<br />
+            <span className="brand-text">AyurSphere</span>
+          </motion.h1>
 
           <motion.p
-            className="hero-subtitle"
+            className="hero-subtitle new-subtitle"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 0.8 }}
