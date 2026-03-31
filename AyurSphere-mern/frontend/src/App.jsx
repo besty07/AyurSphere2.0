@@ -4,6 +4,7 @@ import PortalPage from './pages/PortalPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
+import PlantDetailPage from './pages/PlantDetailPage.jsx';
 import { getUser } from './api/client.js';
 
 const ProtectedRoute = ({ children }) => {
@@ -34,6 +35,14 @@ const App = () => {
         element={
           <ProtectedRoute>
             <FavoritesPage user={user} onUserChange={setUser} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/plant/:id"
+        element={
+          <ProtectedRoute>
+            <PlantDetailPage user={user} onUserChange={setUser} />
           </ProtectedRoute>
         }
       />

@@ -1,0 +1,970 @@
+/* ═══════════════════════════════
+   PLANT DETAIL PAGE
+═══════════════════════════════ */
+
+/* ── Root ── */
+.pd-root {
+  min-height: 100vh;
+  background: #f4f9f1;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ── Loading / Error ── */
+.pd-loading, .pd-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 60vh;
+  color: #5a6b54;
+}
+
+.pd-spinner {
+  width: 44px;
+  height: 44px;
+  border: 4px solid #e0e8db;
+  border-top-color: #2d7318;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.pd-error i {
+  font-size: 3rem;
+  color: #d32f2f;
+  opacity: 0.6;
+}
+
+.pd-error h3 {
+  font-size: 1.3rem;
+  color: #0d1b08;
+}
+
+.pd-error p {
+  color: #5a6b54;
+  font-size: 0.95rem;
+}
+
+/* ── Top Navigation Bar ── */
+.pd-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(135deg, #1b4d0c 0%, #2d7318 60%, #3e8f22 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 20px rgba(21, 41, 12, 0.35);
+}
+
+.pd-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.1rem;
+  background: rgba(255, 255, 255, 0.14);
+  color: white;
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  border-radius: 100px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.pd-back-btn:hover {
+  background: rgba(255, 255, 255, 0.24);
+  transform: translateX(-2px);
+}
+
+.pd-back-btn i {
+  font-size: 0.85rem;
+  transition: transform 0.2s ease;
+}
+
+.pd-back-btn:hover i {
+  transform: translateX(-3px);
+}
+
+.pd-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pd-fav-btn, .pd-share-btn {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1.5px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.pd-fav-btn:hover, .pd-share-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: scale(1.08);
+}
+
+.pd-fav-btn--active {
+  color: #ff4081;
+  background: rgba(255, 64, 129, 0.15);
+  border-color: rgba(255, 64, 129, 0.4);
+}
+
+.pd-fav-btn--active:hover {
+  background: rgba(255, 64, 129, 0.25);
+}
+
+/* ── Hero Section ── */
+.pd-hero {
+  position: relative;
+  overflow: hidden;
+  padding: 2.5rem 2rem 2rem;
+}
+
+.pd-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.pd-hero-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(160deg, #1b4d0c 0%, #2d7318 40%, #357a1a 70%, #4a9828 100%);
+}
+
+.pd-hero-pattern {
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(255,255,255,0.05) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(255,255,255,0.04) 0%, transparent 40%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  opacity: 0.7;
+}
+
+.pd-hero-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  gap: 2.2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: flex-start;
+}
+
+/* Hero Image */
+.pd-hero-image-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.pd-hero-image {
+  width: 260px;
+  height: 220px;
+  border-radius: 18px;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.3), 0 0 0 4px rgba(255,255,255,0.15);
+  background: #edf7e9;
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.pd-hero-image--loaded {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.pd-hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.pd-hero-image:hover img {
+  transform: scale(1.06);
+}
+
+.pd-category-badge {
+  position: absolute;
+  bottom: -8px;
+  left: 14px;
+  padding: 0.35rem 0.85rem;
+  border-radius: 100px;
+  color: white;
+  font-weight: 800;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+  letter-spacing: 0.3px;
+}
+
+/* Hero Info */
+.pd-hero-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding-top: 0.5rem;
+}
+
+.pd-plant-name {
+  color: white;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  line-height: 1.15;
+  animation: fadeSlideRight 0.5s ease both;
+}
+
+.pd-scientific-name {
+  color: rgba(255, 255, 255, 0.75);
+  font-style: italic;
+  font-size: 1.05rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: fadeSlideRight 0.55s ease both;
+}
+
+.pd-scientific-name i {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.pd-uses-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+  animation: fadeSlideRight 0.6s ease both;
+}
+
+.pd-use-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35rem 0.85rem;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 0.82rem;
+  backdrop-filter: blur(4px);
+  transition: background 0.2s ease;
+}
+
+.pd-use-tag:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.pd-desc-quote {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  animation: fadeSlideRight 0.65s ease both;
+}
+
+.pd-desc-accent {
+  width: 3px;
+  border-radius: 3px;
+  background: rgba(127, 255, 106, 0.6);
+  flex-shrink: 0;
+}
+
+.pd-desc-quote p {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  font-weight: 500;
+}
+
+/* ── Tabs ── */
+.pd-tabs {
+  display: flex;
+  gap: 0.3rem;
+  padding: 0 2rem;
+  background: white;
+  border-bottom: 1px solid #e8f0e3;
+  position: sticky;
+  top: 56px;
+  z-index: 50;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+
+.pd-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1.3rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #5a6b54;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  position: relative;
+}
+
+.pd-tab:hover {
+  color: #2d7318;
+  background: rgba(45, 115, 24, 0.04);
+}
+
+.pd-tab--active {
+  color: #2d7318;
+  border-bottom-color: #2d7318;
+  font-weight: 700;
+}
+
+.pd-tab i {
+  font-size: 0.85rem;
+}
+
+/* ── Content Area ── */
+.pd-content {
+  padding: 1.5rem 2rem 3rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* ── Animation ── */
+.pd-animate-in {
+  animation: fadeSlideUp 0.35s ease both;
+}
+
+/* ── Cards ── */
+.pd-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border: 1px solid #e8f0e3;
+  overflow: hidden;
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.pd-card:hover {
+  box-shadow: 0 8px 28px rgba(74, 124, 44, 0.12);
+  transform: translateY(-2px);
+}
+
+.pd-card--full {
+  grid-column: 1 / -1;
+}
+
+.pd-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.1rem 1.3rem;
+  border-bottom: 1px solid #f0f5ec;
+}
+
+.pd-card-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: grid;
+  place-items: center;
+  color: white;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.pd-card-header h3 {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #0d1b08;
+}
+
+.pd-card-body {
+  padding: 1.2rem 1.3rem;
+}
+
+/* ── Tab Panels ── */
+.pd-tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* ── Two Column Layout ── */
+.pd-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.2rem;
+}
+
+/* ── Description Text ── */
+.pd-description-text {
+  font-size: 0.95rem;
+  line-height: 1.75;
+  color: #333;
+}
+
+.pd-highlights {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pd-highlight-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  font-size: 0.9rem;
+  color: #333;
+}
+
+.pd-highlight-item i {
+  color: #2d7318;
+  margin-top: 3px;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+}
+
+/* ── Info Grid (Stats) ── */
+.pd-info-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.9rem;
+}
+
+.pd-stat-card {
+  background: white;
+  border-radius: 14px;
+  padding: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid #e8f0e3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: all 0.25s ease;
+}
+
+.pd-stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+}
+
+.pd-stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.pd-stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.pd-stat-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9caa95;
+}
+
+.pd-stat-value {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #0d1b08;
+}
+
+/* ── Property List ── */
+.pd-property-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.pd-property-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.9rem;
+  color: #333;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f5f8f2;
+  transition: background 0.15s ease;
+}
+
+.pd-property-item:last-child {
+  border-bottom: none;
+}
+
+.pd-property-item:hover {
+  background: rgba(45, 115, 24, 0.03);
+  margin: 0 -1.3rem;
+  padding-left: 1.3rem;
+  padding-right: 1.3rem;
+}
+
+.pd-property-bullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ── Ayurvedic Grid ── */
+.pd-ayur-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.pd-ayur-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: #f8fbf5;
+  border: 1px solid #e8f0e3;
+  transition: all 0.2s ease;
+}
+
+.pd-ayur-item:hover {
+  background: #f0f7eb;
+  border-color: #c8dcc0;
+}
+
+.pd-ayur-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #8B5E3C;
+}
+
+.pd-ayur-value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #333;
+}
+
+/* ── Caution ── */
+.pd-card--caution {
+  border-left: 4px solid #d32f2f;
+}
+
+.pd-caution-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.pd-caution-list li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: #5a3030;
+}
+
+.pd-caution-list li i {
+  font-size: 0.4rem;
+  color: #d32f2f;
+}
+
+/* ── Usage Methods ── */
+.pd-usage-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.pd-usage-method {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  padding: 0.85rem;
+  border-radius: 12px;
+  background: #f8fbf5;
+  border: 1px solid #e8f0e3;
+  transition: all 0.2s ease;
+}
+
+.pd-usage-method:hover {
+  background: #f0f7eb;
+  border-color: #c8dcc0;
+  transform: translateX(4px);
+}
+
+.pd-usage-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+  width: 40px;
+  text-align: center;
+}
+
+.pd-usage-method strong {
+  font-size: 0.9rem;
+  color: #0d1b08;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.pd-usage-method p {
+  font-size: 0.84rem;
+  color: #5a6b54;
+  line-height: 1.5;
+}
+
+/* ── Parts Grid ── */
+.pd-parts-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.7rem;
+}
+
+.pd-part-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8fbf5, #f0f7eb);
+  border: 1px solid #e0e8db;
+  font-weight: 600;
+  font-size: 0.88rem;
+  color: #2d5016;
+  transition: all 0.2s ease;
+  cursor: default;
+}
+
+.pd-part-chip:hover {
+  background: linear-gradient(135deg, #f0f7eb, #e0edda);
+  transform: scale(1.03);
+}
+
+.pd-part-chip i {
+  color: #2d7318;
+  font-size: 0.9rem;
+}
+
+/* ── Research ── */
+.pd-card--research {
+  border-left: 4px solid #1565c0;
+}
+
+.pd-research-quote {
+  position: relative;
+  padding-left: 2.5rem;
+}
+
+.pd-research-quote-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-size: 1.4rem;
+  color: #90caf9;
+}
+
+.pd-research-quote p {
+  font-size: 0.92rem;
+  line-height: 1.75;
+  color: #333;
+  font-style: italic;
+}
+
+/* ── AKA text in hero ── */
+.pd-aka {
+  font-style: normal;
+  font-weight: 400;
+  opacity: 0.7;
+  font-size: 0.92rem;
+}
+
+/* ── Overview Points ── */
+.pd-overview-points {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.pd-overview-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.65rem 0.8rem;
+  border-radius: 10px;
+  transition: background 0.15s ease;
+}
+
+.pd-overview-point:hover {
+  background: #f8fbf5;
+}
+
+.pd-overview-bullet {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.pd-overview-bullet i {
+  color: #2d7318;
+  font-size: 0.88rem;
+}
+
+.pd-overview-point p {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* ── Disease Grid ── */
+.pd-disease-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pd-disease-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  background: #fef5f5;
+  border: 1px solid #fce0e0;
+  font-size: 0.88rem;
+  color: #5a2020;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.pd-disease-chip:hover {
+  background: #fde8e8;
+  border-color: #f5c4c4;
+  transform: translateX(3px);
+}
+
+.pd-disease-chip i {
+  color: #c62828;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+/* ── Parts Detail List ── */
+.pd-parts-detail-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.pd-part-detail {
+  padding: 1rem;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f8fbf5, #f0f7eb);
+  border: 1px solid #e0e8db;
+  transition: all 0.2s ease;
+}
+
+.pd-part-detail:hover {
+  background: linear-gradient(135deg, #f0f7eb, #e4eddc);
+  border-color: #c8dcc0;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.06);
+}
+
+.pd-part-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.45rem;
+}
+
+.pd-part-icon {
+  font-size: 1.2rem;
+}
+
+.pd-part-detail strong {
+  font-size: 0.95rem;
+  color: #1b4d0c;
+}
+
+.pd-part-detail p {
+  font-size: 0.84rem;
+  color: #5a6b54;
+  line-height: 1.55;
+}
+
+/* ── Parts Usage Grid (How to Use tab) ── */
+.pd-parts-usage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.pd-part-usage-card {
+  padding: 1.2rem;
+  border-radius: 14px;
+  background: white;
+  border: 1px solid #e8f0e3;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  transition: all 0.25s ease;
+  text-align: center;
+}
+
+.pd-part-usage-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(74, 124, 44, 0.12);
+  border-color: #c8dcc0;
+}
+
+.pd-part-usage-icon {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.pd-part-usage-card h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1b4d0c;
+  margin-bottom: 0.4rem;
+}
+
+.pd-part-usage-card p {
+  font-size: 0.82rem;
+  color: #5a6b54;
+  line-height: 1.55;
+}
+
+/* ── Four-column Ayurvedic Grid ── */
+.pd-ayur-grid--four {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+/* ── Animations ── */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeSlideRight {
+  from {
+    opacity: 0;
+    transform: translateX(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .pd-hero-content {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .pd-hero-info {
+    align-items: center;
+  }
+
+  .pd-uses-tags {
+    justify-content: center;
+  }
+
+  .pd-desc-quote {
+    text-align: left;
+  }
+
+  .pd-two-col {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-info-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pd-tabs {
+    overflow-x: auto;
+    padding: 0 1rem;
+  }
+
+  .pd-content {
+    padding: 1.2rem 1rem 2rem;
+  }
+
+  .pd-ayur-grid--four {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .pd-parts-detail-list {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-parts-usage-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .pd-hero {
+    padding: 1.5rem 1rem 1.2rem;
+  }
+
+  .pd-hero-image {
+    width: 200px;
+    height: 170px;
+  }
+
+  .pd-plant-name {
+    font-size: 1.6rem;
+  }
+
+  .pd-info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-ayur-grid,
+  .pd-ayur-grid--four {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-parts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-parts-usage-grid {
+    grid-template-columns: 1fr;
+  }
+}
+

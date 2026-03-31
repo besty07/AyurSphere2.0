@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import PlantCard from '../components/PlantCard.jsx';
+import AddPlantModal from '../components/AddPlantModal.jsx';
 import { clearSession, request } from '../api/client.js';
 import '../styles/dashboard.css';
 
@@ -19,6 +20,7 @@ const DashboardPage = ({ user, onUserChange }) => {
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeSidebar, setActiveSidebar] = useState('browse');
   const [loading, setLoading] = useState(true);
+  const [showAddPlant, setShowAddPlant] = useState(false);
   const navigate = useNavigate();
 
   const isFavorite = (plantId) => favorites.some((fav) => (fav._id || fav.id) === plantId);
@@ -185,7 +187,7 @@ const DashboardPage = ({ user, onUserChange }) => {
                 </h2>
                 <p className="hero-subtitle">Continue exploring the ancient wisdom of Ayurvedic medicine</p>
               </div>
-              <button className="hero-add-btn">
+              <button className="hero-add-btn" onClick={() => setShowAddPlant(true)}>
                 <i className="fas fa-plus" /> Add New Plant
               </button>
             </div>
@@ -222,6 +224,13 @@ const DashboardPage = ({ user, onUserChange }) => {
           )}
         </main>
       </div>
+
+      {/* Add Plant Modal */}
+      <AddPlantModal
+        isOpen={showAddPlant}
+        onClose={() => setShowAddPlant(false)}
+        onPlantAdded={() => fetchPlants()}
+      />
     </div>
   );
 };
