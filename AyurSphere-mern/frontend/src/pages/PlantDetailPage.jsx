@@ -133,7 +133,7 @@ const PlantDetailPage = ({ user, onUserChange }) => {
           <i className="fas fa-exclamation-circle" />
           <h3>Plant Not Found</h3>
           <p>{error || 'The plant you are looking for does not exist.'}</p>
-          <button className="pd-back-btn" onClick={() => navigate('/')}>
+          <button className="pd-back-btn" onClick={() => navigate('/dashboard')}>
             <i className="fas fa-arrow-left" /> Back to Plants
           </button>
         </div>
@@ -161,7 +161,7 @@ const PlantDetailPage = ({ user, onUserChange }) => {
     <div className="pd-root">
       {/* ── TOP NAV BAR ── */}
       <nav className="pd-topbar">
-        <button className="pd-back-btn" onClick={() => navigate('/')}>
+        <button className="pd-back-btn" onClick={() => navigate('/dashboard')}>
           <i className="fas fa-arrow-left" />
           <span>Back to Plants</span>
         </button>

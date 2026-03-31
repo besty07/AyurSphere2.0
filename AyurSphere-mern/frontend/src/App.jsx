@@ -6,6 +6,8 @@ import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
 import PlantDetailPage from './pages/PlantDetailPage.jsx';
+import UserProfilePage from './pages/UserProfilePage.jsx';
+import CheckoutPage from './pages/CheckoutPage.jsx';
 import { getUser } from './api/client.js';
 
 const ProtectedRoute = ({ children }) => {
@@ -45,6 +47,22 @@ const App = () => {
         element={
           <ProtectedRoute>
             <PlantDetailPage user={user} onUserChange={setUser} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <ProtectedRoute>
+            <UserProfilePage user={user} onUserChange={setUser} />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/checkout"
+        element={
+          <ProtectedRoute>
+            <CheckoutPage user={user} />
           </ProtectedRoute>
         }
       />
