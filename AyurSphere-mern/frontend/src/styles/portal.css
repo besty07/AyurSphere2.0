@@ -23,7 +23,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(10, 40, 8, 0.7) 0%, rgba(25, 80, 15, 0.65) 100%);
+  background: rgba(0, 0, 0, 0.4); /* Replaced green tint with neutral dark tint */
   z-index: 1;
 }
 
@@ -56,9 +56,22 @@
   border-radius: 16px;
   padding: 0.5rem;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.2rem;
+}
+
+.portal-brand-text {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-top: 0.2rem;
+  letter-spacing: -0.5px;
+  background: linear-gradient(to right, #a8e063, #1db954);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .portal-logo img {

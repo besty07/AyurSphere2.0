@@ -8,7 +8,8 @@ const PortalPage = () => {
     <div className="portal-page">
       <div className="portal-card">
         <div className="portal-logo">
-          <img src="/images/logo-final.png" alt="AyurSphere" />
+          <img src="/images/logo-final.png" alt="AyurSphere Logo" />
+          <h1 className="portal-brand-text">AyurSphere</h1>
         </div>
 
         <p className="portal-tagline">The sphere of healing, reimagined</p>

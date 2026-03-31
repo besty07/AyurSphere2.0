@@ -7,13 +7,41 @@ const VoiceAssistant = () => {
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [messages, setMessages] = useState([
-    { role: 'bot', text: 'Namaste! Main AyurSphere Assistant hoon. Aapko kis paudhe ya beemari ke baare mein jaanna hai?' }
+    { role: 'bot', text: 'Discover personalized Ayurvedic remedies and plant-based healing solutions.\nHow can I help you today?' }
   ]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [dimensions, setDimensions] = useState({ width: 400, height: 550 });
 
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const currentAudioRef = useRef(null);
+
+  const startResize = (e) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = dimensions.width;
+    const startH = dimensions.height;
+
+    const onMouseMove = (moveEvent) => {
+      moveEvent.preventDefault();
+      const deltaX = startX - moveEvent.clientX;
+      const deltaY = startY - moveEvent.clientY;
+      
+      setDimensions({
+        width: Math.max(300, Math.min(800, startW + deltaX)),
+        height: Math.max(300, Math.min(800, startH + deltaY)),
+      });
+    };
+
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  };
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
@@ -102,15 +130,27 @@ const VoiceAssistant = () => {
   return (
     <div className="voice-widget-container">
       {/* The Chat Window */}
-      <div className={`voice-chat-window ${isOpen ? 'open' : ''}`}>
+      <div 
+        className={`voice-chat-window ${isOpen ? 'open' : ''}`}
+        style={{ width: `${dimensions.width}px`, height: `${dimensions.height}px` }}
+      >
         <div className="voice-chat-header">
           <div className="vch-left">
-            <i className="fas fa-leaf" style={{ color: '#a8ff78' }}></i>
-            <span>AyurBot</span>
+            <img src="/images/logo-final.png" alt="AyurSphere" className="vch-logo" />
+            <span className="vch-brand-text">AyurBot</span>
           </div>
-          <button className="vch-close" onClick={toggleOpen}>
-            <i className="fas fa-times"></i>
-          </button>
+          <div className="vch-right">
+            <div 
+              className="voice-chat-resizer" 
+              onMouseDown={startResize}
+              title="Drag to resize"
+            >
+              <i className="fas fa-expand-arrows-alt" />
+            </div>
+            <button className="vch-close" onClick={toggleOpen}>
+              <i className="fas fa-times"></i>
+            </button>
+          </div>
         </div>
 
         <div className="voice-chat-body">

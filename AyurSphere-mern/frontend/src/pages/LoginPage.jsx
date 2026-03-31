@@ -56,7 +56,8 @@ const LoginPage = ({ onAuth }) => {
     <div className="auth-page">
       <div className="auth-card">
         <div className="logo-area">
-          <img src="/images/logo-final.png" alt="AyurSphere" />
+          <img src="/images/logo-final.png" alt="AyurSphere Logo" />
+          <h1 className="portal-brand-text">AyurSphere</h1>
           <h3 className="auth-portal-label">
             {isAdmin ? (
               <><i className="fas fa-user-shield" /> Administrator Access</>
