@@ -11,11 +11,14 @@ export const checkoutCart = async (req, res) => {
     // Fetch user's active cart to map items
     const cart = await Cart.findOne({ user: req.user.id }).populate('items.product');
     
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: 'Your cart is empty' });
+    // Auto-clean zombie products
+    const validItems = cart?.items?.filter(item => item.product) || [];
+
+    if (!cart || validItems.length === 0) {
+      return res.status(400).json({ message: 'Your cart is empty or only contains deleted products.' });
     }
 
-    const orderItems = cart.items.map(item => {
+    const orderItems = validItems.map(item => {
       const p = item.product;
       return {
         product: p._id,
