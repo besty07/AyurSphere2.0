@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import LandingPage from './pages/LandingPage.jsx';
 import PortalPage from './pages/PortalPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
@@ -20,10 +21,11 @@ const App = () => {
 
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/portal" element={<PortalPage />} />
       <Route path="/login" element={<LoginPage onAuth={setUser} />} />
       <Route
-        path="/"
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <DashboardPage user={user} onUserChange={setUser} />
@@ -47,6 +49,7 @@ const App = () => {
         }
       />
       <Route path="*" element={<Navigate to="/portal" />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };
