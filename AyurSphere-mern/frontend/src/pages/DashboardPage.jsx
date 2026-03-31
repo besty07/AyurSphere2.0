@@ -363,6 +363,12 @@ const DashboardPage = ({ user, onUserChange }) => {
             )}
           </button>
 
+          {user?.role === 'admin' && (
+            <button className="header-icon-btn" onClick={() => navigate('/admin')} title="Admin Dashboard" style={{ color: '#d4af37' }}>
+              <i className="fas fa-shield-alt" />
+            </button>
+          )}
+
           <button className="header-icon-btn" onClick={handleCartOpen} title="Shopping Cart">
             <i className="fas fa-shopping-cart" />
             {cartCount > 0 && (

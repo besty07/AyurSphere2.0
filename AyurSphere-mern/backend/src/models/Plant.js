@@ -33,6 +33,8 @@ const plantSchema = new mongoose.Schema(
       vipaka: { type: String, default: '' },
       dosha: { type: String, default: '' },
     },
+    status: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Approved' },
+    submittedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }
 );

@@ -29,6 +29,11 @@ export const listPlants = async (req, res) => {
     filters.category = category;
   }
 
+  // If not admin, only show approved plants
+  if (!req.user || req.user.role !== 'admin') {
+    filters.status = 'Approved';
+  }
+
   try {
     const plants = await Plant.find(filters).sort({ createdAt: -1 });
     return res.json(plants);
@@ -57,10 +62,34 @@ export const createPlant = async (req, res) => {
       partsUsed: partsUsed || [],
       usageMethods: usageMethods || [],
       ayurvedicProfile: ayurvedicProfile || {},
+      status: req.user.role === 'admin' ? 'Approved' : 'Pending',
+      submittedBy: req.user.id
     });
     return res.status(201).json(plant);
   } catch (err) {
     console.error('Create plant error', err);
     return res.status(500).json({ message: 'Failed to create plant' });
+  }
+};
+
+export const updatePlant = async (req, res) => {
+  try {
+    const plant = await Plant.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    if (!plant) return res.status(404).json({ message: 'Plant not found' });
+    return res.json(plant);
+  } catch (err) {
+    console.error('Update plant error', err);
+    return res.status(500).json({ message: 'Failed to update plant' });
+  }
+};
+
+export const deletePlant = async (req, res) => {
+  try {
+    const plant = await Plant.findByIdAndDelete(req.params.id);
+    if (!plant) return res.status(404).json({ message: 'Plant not found' });
+    return res.json({ message: 'Plant deleted successfully' });
+  } catch (err) {
+    console.error('Delete plant error', err);
+    return res.status(500).json({ message: 'Failed to delete plant' });
   }
 };

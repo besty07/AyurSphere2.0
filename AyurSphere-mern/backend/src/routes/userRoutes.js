@@ -1,6 +1,7 @@
 import express from 'express';
-import { getProfile, updateProfile, sendOtp } from '../controllers/userController.js';
+import { getProfile, updateProfile, getAllUsers, sendOtp } from '../controllers/userController.js';
 import { authMiddleware } from '../middleware/auth.js';
+import { adminMiddleware } from '../middleware/admin.js';
 import { upload } from '../middleware/upload.js';
 
 const router = express.Router();
@@ -8,7 +9,10 @@ const router = express.Router();
 // Get profile
 router.get('/profile', authMiddleware, getProfile);
 
-// Update profile (allow multer to handle multipart/form-data for 'profilePicture')
+// Get all users (Admin only)
+router.get('/', authMiddleware, adminMiddleware, getAllUsers);
+
+// Update profile...
 router.put('/profile', authMiddleware, upload.single('profilePicture'), updateProfile);
 
 // Send OTP

@@ -64,6 +64,15 @@ export const updateProfile = async (req, res) => {
   }
 };
 
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select('-password');
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error retrieving users', error: error.message });
+  }
+};
+
 export const sendOtp = async (req, res) => {
   try {
     // In a real app, integrate Twilio/SNS here

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { request } from '../api/client.js';
+import { request, getUser } from '../api/client.js';
 import '../styles/addPlantModal.css';
 
 const categoryOptions = [
@@ -109,6 +109,11 @@ const AddPlantModal = ({ isOpen, onClose, onPlantAdded }) => {
       await request('/plants', { method: 'POST', body });
       setForm({ ...emptyForm });
       setStep(1);
+      const user = getUser();
+      const msg = user?.role === 'admin' 
+        ? 'Medicinal plant added successfully to the database!' 
+        : 'Plant details submitted successfully! It will appear on the dashboard once approved by an admin.';
+      alert(msg);
       onPlantAdded?.();
       onClose();
     } catch (err) {
