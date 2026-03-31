@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
+import LandingPage from './pages/LandingPage.jsx';
 import PortalPage from './pages/PortalPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import DashboardPage from './pages/DashboardPage.jsx';
 import FavoritesPage from './pages/FavoritesPage.jsx';
+import PlantDetailPage from './pages/PlantDetailPage.jsx';
 import { getUser } from './api/client.js';
 
 const ProtectedRoute = ({ children }) => {
@@ -19,10 +21,11 @@ const App = () => {
 
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route path="/portal" element={<PortalPage />} />
       <Route path="/login" element={<LoginPage onAuth={setUser} />} />
       <Route
-        path="/"
+        path="/dashboard"
         element={
           <ProtectedRoute>
             <DashboardPage user={user} onUserChange={setUser} />
@@ -37,7 +40,16 @@ const App = () => {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/plant/:id"
+        element={
+          <ProtectedRoute>
+            <PlantDetailPage user={user} onUserChange={setUser} />
+          </ProtectedRoute>
+        }
+      />
       <Route path="*" element={<Navigate to="/portal" />} />
+      <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
 };

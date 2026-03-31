@@ -1,6 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PlantCard from '../components/PlantCard.jsx';
+import AddPlantModal from '../components/AddPlantModal.jsx';
+import CartPanel from '../components/CartPanel.jsx';
 import { clearSession, request } from '../api/client.js';
 import '../styles/dashboard.css';
 
@@ -12,9 +14,13 @@ const DashboardPage = ({ user, onUserChange }) => {
   const [activeCategory, setActiveCategory] = useState(null);
   const [activeSidebar, setActiveSidebar] = useState('browse');
   const [loading, setLoading] = useState(true);
+  const [showAddPlant, setShowAddPlant] = useState(false);
+  const [cart, setCart] = useState(null);
+  const [cartOpen, setCartOpen] = useState(false);
   const navigate = useNavigate();
 
   const isFavorite = (plantId) => favorites.some((fav) => (fav._id || fav.id) === plantId);
+  const cartCount = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
 
   const fetchPlants = async () => {
     const data = await request('/plants');
@@ -30,10 +36,17 @@ const DashboardPage = ({ user, onUserChange }) => {
     setFavorites(data);
   };
 
+  const fetchCart = useCallback(async () => {
+    try {
+      const data = await request('/cart');
+      setCart(data);
+    } catch (_) {}
+  }, []);
+
   useEffect(() => {
     const load = async () => {
       try {
-        await Promise.all([fetchPlants(), fetchFavorites()]);
+        await Promise.all([fetchPlants(), fetchFavorites(), fetchCart()]);
       } catch (err) {
         console.error(err);
       } finally {
@@ -70,6 +83,37 @@ const DashboardPage = ({ user, onUserChange }) => {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleCartUpdate = async (productId, quantity) => {
+    try {
+      const data = await request('/cart/update', {
+        method: 'PATCH',
+        body: { productId, quantity },
+      });
+      setCart(data);
+    } catch (err) {
+      console.error('Cart update error', err);
+    }
+  };
+
+  const handleCartRemove = async (productId) => {
+    try {
+      const data = await request(`/cart/remove/${productId}`, { method: 'DELETE' });
+      setCart(data);
+    } catch (err) {
+      console.error('Cart remove error', err);
+    }
+  };
+
+  const handleCartOpen = async () => {
+    await fetchCart();
+    setCartOpen(true);
+  };
+
+  const handleCheckout = () => {
+    alert('Checkout coming soon! Your order total: ₹' +
+      (cart?.items || []).reduce((s, i) => s + (i.product?.price || 0) * i.quantity, 0));
   };
 
   const logout = () => {
@@ -163,9 +207,11 @@ const DashboardPage = ({ user, onUserChange }) => {
             )}
           </button>
 
-          <button className="header-icon-btn">
+          <button className="header-icon-btn" onClick={handleCartOpen} title="Shopping Cart">
             <i className="fas fa-shopping-cart" />
-            <span className="header-badge header-badge--red">1</span>
+            {cartCount > 0 && (
+              <span className="header-badge header-badge--red">{cartCount}</span>
+            )}
           </button>
 
           <span className="header-username">{user?.username}</span>
@@ -233,7 +279,7 @@ const DashboardPage = ({ user, onUserChange }) => {
                 </h2>
                 <p className="hero-subtitle">Continue exploring the ancient wisdom of Ayurvedic medicine</p>
               </div>
-              <button className="hero-add-btn">
+              <button className="hero-add-btn" onClick={() => setShowAddPlant(true)}>
                 <i className="fas fa-plus" /> Add New Plant
               </button>
             </div>
@@ -270,6 +316,23 @@ const DashboardPage = ({ user, onUserChange }) => {
           )}
         </main>
       </div>
+
+      {/* Add Plant Modal */}
+      <AddPlantModal
+        isOpen={showAddPlant}
+        onClose={() => setShowAddPlant(false)}
+        onPlantAdded={() => fetchPlants()}
+      />
+
+      {/* Cart Panel */}
+      <CartPanel
+        isOpen={cartOpen}
+        onClose={() => setCartOpen(false)}
+        cart={cart}
+        onUpdate={handleCartUpdate}
+        onRemove={handleCartRemove}
+        onCheckout={handleCheckout}
+      />
     </div>
   );
 };

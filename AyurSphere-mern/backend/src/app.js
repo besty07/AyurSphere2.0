@@ -4,6 +4,8 @@ import morgan from 'morgan';
 import authRoutes from './routes/authRoutes.js';
 import plantRoutes from './routes/plantRoutes.js';
 import favoriteRoutes from './routes/favoriteRoutes.js';
+import productRoutes from './routes/productRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
 
 const app = express();
 
@@ -15,6 +17,8 @@ app.get('/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/plants', plantRoutes);
 app.use('/api/favorites', favoriteRoutes);
+app.use('/api/products', productRoutes);
+app.use('/api/cart', cartRoutes);
 
 app.use((req, res) => res.status(404).json({ message: 'Not found' }));
 

@@ -8,6 +8,30 @@ const plantSchema = new mongoose.Schema(
     uses: { type: String, default: '' },
     imagePath: { type: String, default: '' },
     category: { type: String, default: 'Herb' },
+
+    /* ── Extended detail fields ── */
+    aka: { type: String, default: '' },
+    overview: [{ type: String }],
+    diseases: [{ type: String }],
+    partsUsed: [
+      {
+        part: { type: String },
+        uses: { type: String },
+      },
+    ],
+    usageMethods: [
+      {
+        emoji: { type: String },
+        name: { type: String },
+        desc: { type: String },
+      },
+    ],
+    ayurvedicProfile: {
+      rasa: { type: String, default: '' },
+      virya: { type: String, default: '' },
+      vipaka: { type: String, default: '' },
+      dosha: { type: String, default: '' },
+    },
   },
   { timestamps: true }
 );

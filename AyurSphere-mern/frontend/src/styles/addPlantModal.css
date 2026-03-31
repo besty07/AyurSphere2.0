@@ -1,0 +1,518 @@
+/* ═══════════════════════════════
+   ADD PLANT MODAL
+═══════════════════════════════ */
+
+/* ── Overlay ── */
+.apm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: grid;
+  place-items: center;
+  z-index: 9999;
+  animation: apmFadeIn 0.2s ease;
+}
+
+/* ── Modal ── */
+.apm-modal {
+  background: white;
+  border-radius: 20px;
+  width: min(720px, 94vw);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.2);
+  animation: apmSlideUp 0.3s ease;
+  overflow: hidden;
+}
+
+/* ── Header ── */
+.apm-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.2rem 1.5rem;
+  background: linear-gradient(135deg, #f0f7eb, #e8f2e0);
+  border-bottom: 1px solid #d8e8cd;
+}
+
+.apm-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.apm-header-icon {
+  font-size: 1.4rem;
+  color: #2d7318;
+}
+
+.apm-header h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0d1b08;
+}
+
+.apm-header p {
+  font-size: 0.8rem;
+  color: #5a6b54;
+  margin-top: 0.1rem;
+}
+
+.apm-close {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid #d8e8cd;
+  background: white;
+  color: #5a6b54;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.15s;
+}
+
+.apm-close:hover {
+  background: #fef2f2;
+  color: #d32f2f;
+  border-color: #fcc;
+}
+
+/* ── Step Indicator ── */
+.apm-steps {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.75rem 1.5rem;
+  background: #fafdf7;
+  border-bottom: 1px solid #e8f0e3;
+}
+
+.apm-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  border: none;
+  background: none;
+  color: #9caa95;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+
+.apm-step:hover {
+  background: rgba(45, 115, 24, 0.06);
+}
+
+.apm-step--active {
+  color: #2d7318;
+  background: rgba(45, 115, 24, 0.1);
+}
+
+.apm-step--done {
+  color: #4a7c2c;
+}
+
+.apm-step-num {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #e8f0e3;
+  color: #9caa95;
+  display: grid;
+  place-items: center;
+  font-size: 0.7rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.apm-step--active .apm-step-num {
+  background: #2d7318;
+  color: white;
+}
+
+.apm-step--done .apm-step-num {
+  background: #4a7c2c;
+  color: white;
+}
+
+.apm-step-label {
+  white-space: nowrap;
+}
+
+/* ── Body ── */
+.apm-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.2rem 1.5rem;
+}
+
+/* ── Error ── */
+.apm-error {
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fcc;
+  color: #c62828;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Step Panel ── */
+.apm-step-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.apm-animate {
+  animation: apmFadeSlide 0.25s ease;
+}
+
+/* ── Fields ── */
+.apm-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.apm-field label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #2d5016;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.apm-field label i {
+  font-size: 0.78rem;
+  color: #4a7c2c;
+}
+
+.apm-req {
+  color: #d32f2f;
+}
+
+.apm-field input,
+.apm-field select,
+.apm-field textarea {
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid #dbe6d4;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  font-family: inherit;
+  color: #0d1b08;
+  background: #fafdf7;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.apm-field input:focus,
+.apm-field select:focus,
+.apm-field textarea:focus {
+  border-color: #2d7318;
+  box-shadow: 0 0 0 3px rgba(45, 115, 24, 0.1);
+  background: white;
+}
+
+.apm-field input::placeholder,
+.apm-field textarea::placeholder {
+  color: #b0bfaa;
+}
+
+.apm-field small {
+  font-size: 0.72rem;
+  color: #9caa95;
+}
+
+.apm-field textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+/* ── Row Layouts ── */
+.apm-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.9rem;
+}
+
+/* ── Section Title ── */
+.apm-section-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #2d5016;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+  margin-top: 0.3rem;
+}
+
+.apm-section-title i {
+  color: #4a7c2c;
+}
+
+.apm-hint {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #9caa95;
+  flex-basis: 100%;
+  margin-top: 0.1rem;
+}
+
+/* ── Numbered Field ── */
+.apm-field--numbered {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.apm-field-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #e8f0e3;
+  color: #4a7c2c;
+  display: grid;
+  place-items: center;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.apm-field--numbered input {
+  flex: 1;
+}
+
+/* ── Divider ── */
+.apm-divider {
+  height: 1px;
+  background: #e8f0e3;
+  margin: 0.5rem 0;
+}
+
+/* ── Part Row ── */
+.apm-part-row {
+  display: flex;
+  gap: 0.65rem;
+}
+
+.apm-field--sm { flex: 0 0 140px; }
+.apm-field--md { flex: 0 0 180px; }
+.apm-field--lg { flex: 1; }
+.apm-field--xl { flex: 1; }
+
+/* ── Method Row ── */
+.apm-method-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.apm-field--emoji {
+  flex: 0 0 56px;
+}
+.apm-field--emoji input {
+  text-align: center;
+  font-size: 1.2rem;
+  padding: 0.45rem;
+}
+
+/* ── Preview ── */
+.apm-preview {
+  margin-top: 0.5rem;
+  border-radius: 12px;
+  background: #f8fbf5;
+  border: 1px solid #e0e8db;
+  padding: 0.9rem;
+}
+
+.apm-preview h4 {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #5a6b54;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.apm-preview-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.apm-preview-card strong {
+  font-size: 1.05rem;
+  color: #0d1b08;
+}
+
+.apm-preview-card em {
+  font-size: 0.85rem;
+  color: #5a6b54;
+}
+
+.apm-preview-aka {
+  font-size: 0.8rem;
+  color: #9caa95;
+}
+
+.apm-preview-card p {
+  font-size: 0.82rem;
+  color: #666;
+  margin-top: 0.2rem;
+}
+
+.apm-preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+}
+
+.apm-preview-tag {
+  padding: 0.2rem 0.55rem;
+  border-radius: 100px;
+  background: #e8f0e3;
+  color: #2d5016;
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+/* ── Footer ── */
+.apm-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.9rem 1.5rem;
+  border-top: 1px solid #e8f0e3;
+  background: #fafdf7;
+}
+
+.apm-footer-left,
+.apm-footer-right {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* ── Buttons ── */
+.apm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid transparent;
+}
+
+.apm-btn--primary {
+  background: linear-gradient(135deg, #2d7318, #3e8f22);
+  color: white;
+  box-shadow: 0 4px 12px rgba(45, 115, 24, 0.25);
+}
+
+.apm-btn--primary:hover {
+  background: linear-gradient(135deg, #245e13, #2d7318);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(45, 115, 24, 0.3);
+}
+
+.apm-btn--primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.apm-btn--submit {
+  padding: 0.6rem 1.4rem;
+}
+
+.apm-btn--outline {
+  background: white;
+  border-color: #dbe6d4;
+  color: #5a6b54;
+}
+
+.apm-btn--outline:hover {
+  background: #f8fbf5;
+  border-color: #2d7318;
+  color: #2d7318;
+}
+
+.apm-btn--ghost {
+  background: none;
+  border: none;
+  color: #9caa95;
+}
+
+.apm-btn--ghost:hover {
+  color: #d32f2f;
+}
+
+/* ── Animations ── */
+@keyframes apmFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes apmSlideUp {
+  from { opacity: 0; transform: translateY(20px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes apmFadeSlide {
+  from { opacity: 0; transform: translateX(12px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .apm-modal {
+    width: 100vw;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .apm-row {
+    grid-template-columns: 1fr;
+  }
+
+  .apm-part-row,
+  .apm-method-row {
+    flex-direction: column;
+  }
+
+  .apm-field--sm,
+  .apm-field--md,
+  .apm-field--emoji {
+    flex: unset;
+  }
+
+  .apm-steps {
+    overflow-x: auto;
+    gap: 0.1rem;
+    padding: 0.5rem 0.75rem;
+  }
+
+  .apm-step-label {
+    font-size: 0.7rem;
+  }
+}
