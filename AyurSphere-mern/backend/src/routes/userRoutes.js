@@ -1,5 +1,5 @@
 import express from 'express';
-import { getProfile, updateProfile } from '../controllers/userController.js';
+import { getProfile, updateProfile, sendOtp } from '../controllers/userController.js';
 import { authMiddleware } from '../middleware/auth.js';
 import { upload } from '../middleware/upload.js';
 
@@ -10,5 +10,8 @@ router.get('/profile', authMiddleware, getProfile);
 
 // Update profile (allow multer to handle multipart/form-data for 'profilePicture')
 router.put('/profile', authMiddleware, upload.single('profilePicture'), updateProfile);
+
+// Send OTP
+router.post('/send-otp', authMiddleware, sendOtp);
 
 export default router;

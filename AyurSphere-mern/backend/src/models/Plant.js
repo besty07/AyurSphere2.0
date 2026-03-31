@@ -16,6 +16,7 @@ const plantSchema = new mongoose.Schema(
     partsUsed: [
       {
         part: { type: String },
+        properties: { type: String },
         uses: { type: String },
       },
     ],

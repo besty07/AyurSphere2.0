@@ -11,7 +11,9 @@ const userSchema = new mongoose.Schema(
     gender: { type: String },
     address: { type: String },
     medicalHistory: { type: String },
-    profilePicture: { type: String }
+    profilePicture: { type: String },
+    otp: { type: String },
+    otpExpire: { type: Date }
   },
   { timestamps: { createdAt: 'createdAt' } }
 );

@@ -27,7 +27,7 @@ const CartPanel = ({ isOpen, onClose, cart, onAdd, onRemove, onUpdate, onCheckou
     return () => { document.body.style.overflow = ''; };
   }, [isOpen]);
 
-  const items = cart?.items || [];
+  const items = (cart?.items || []).filter(i => i.product);
   const total = items.reduce((sum, item) => {
     const price = item.product?.price || 0;
     return sum + price * item.quantity;

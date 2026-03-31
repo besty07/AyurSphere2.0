@@ -25,7 +25,15 @@ export const signup = async (req, res) => {
     const token = signToken(user);
     return res.status(201).json({
       token,
-      user: { id: user._id, username: user.username, role: user.role, createdAt: user.createdAt },
+      user: { 
+        id: user._id, 
+        username: user.username, 
+        role: user.role, 
+        email: user.email,
+        mobile: user.mobile,
+        address: user.address,
+        createdAt: user.createdAt 
+      },
     });
   } catch (err) {
     console.error('Signup error', err);
@@ -51,7 +59,18 @@ export const login = async (req, res) => {
     }
 
     const token = signToken(user);
-    return res.json({ token, user: { id: user._id, username: user.username, role: user.role, createdAt: user.createdAt } });
+    return res.json({ 
+      token, 
+      user: { 
+        id: user._id, 
+        username: user.username, 
+        role: user.role, 
+        email: user.email,
+        mobile: user.mobile,
+        address: user.address,
+        createdAt: user.createdAt 
+      } 
+    });
   } catch (err) {
     console.error('Login error', err);
     return res.status(500).json({ message: 'Failed to login' });

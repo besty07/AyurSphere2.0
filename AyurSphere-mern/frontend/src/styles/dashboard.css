@@ -90,6 +90,39 @@
   transition: background 0.2s ease, transform 0.2s ease;
 }
 
+.profile-warning-banner {
+  background: #fff3cd;
+  color: #856404;
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 1px solid #ffeeba;
+  transition: background 0.2s;
+}
+
+.profile-warning-banner i.fa-exclamation-triangle {
+  color: #ff9800;
+  font-size: 1.2rem;
+}
+
+.profile-warning-banner .pwd-link {
+  margin-left: auto;
+  font-weight: 700;
+  color: #2d7318;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: underline;
+}
+
+.profile-warning-banner:hover {
+  background: #ffeeba;
+}
+
 .header-icon-btn:hover {
   background: rgba(255,255,255,0.25);
   transform: scale(1.05);

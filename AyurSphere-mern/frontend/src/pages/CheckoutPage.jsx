@@ -93,7 +93,7 @@ const CheckoutPage = ({ user }) => {
     }
   };
 
-  const items = cart?.items || [];
+  const items = (cart?.items || []).filter(i => i.product);
   const subTotal = items.reduce((sum, item) => sum + ((item.product?.price || 0) * item.quantity), 0);
   const gstAmount = Math.round(subTotal * 0.05); // 5% Standard Ayurvedic GST Placeholder
   const shippingAmount = subTotal > 0 ? 50 : 0; // Standard 50 shipping

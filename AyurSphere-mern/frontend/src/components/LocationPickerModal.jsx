@@ -1,19 +1,32 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
-import markerIcon from 'leaflet/dist/images/marker-icon.png';
-import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-// Fix leaflet default icon issue in React
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
+// Create a safe, local icon instance instead of corrupting the global prototype
+const customMarkerIcon = new L.Icon({
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
 });
+
+class MapErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, message: '' };
+  }
+  static getDerivedStateFromError(error) {
+    return { hasError: true, message: error.toString() };
+  }
+  render() {
+    if (this.state.hasError) return <div style={{padding:'20px', color:'red'}}>Map crashed: {this.state.message}</div>;
+    return this.props.children;
+  }
+}
 
 const LocationMarker = ({ position, setPosition }) => {
   useMapEvents({
@@ -23,7 +36,7 @@ const LocationMarker = ({ position, setPosition }) => {
   });
 
   return position === null ? null : (
-    <Marker position={position}></Marker>
+    <Marker position={position} icon={customMarkerIcon}></Marker>
   );
 };
 
@@ -36,10 +49,48 @@ const MapCenterer = ({ center }) => {
   return null;
 };
 
+// Component to force Leaflet to recalculate container dimensions when modal opens
+const MapSizeFixer = () => {
+  const map = useMap();
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [map]);
+  return null;
+};
+
 const LocationPickerModal = ({ isOpen, onClose, onConfirm }) => {
   const [position, setPosition] = useState(null);
   const [address, setAddress] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isLocating, setIsLocating] = useState(false);
+
+  // Auto-locate the user immediately when the modal opens!
+  useEffect(() => {
+    if (isOpen && !position) {
+      setIsLocating(true);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            setPosition({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+            setIsLocating(false);
+          }, 
+          (err) => {
+            console.warn("Geolocation Error:", err.message);
+            alert("Precise GPS access failed or was denied. Defaulting to general map. Please allow location permissions in your browser.");
+            setPosition({ lat: 20.5937, lng: 78.9629 }); // Fallback to India
+            setIsLocating(false);
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+        );
+      } else {
+        setPosition({ lat: 20.5937, lng: 78.9629 }); // Fallback
+        setIsLocating(false);
+      }
+    }
+  }, [isOpen]); // Only run when open state toggles
 
   useEffect(() => {
     // If we have a position, attempt to reverse-geocode it to a string
@@ -96,18 +147,29 @@ const LocationPickerModal = ({ isOpen, onClose, onConfirm }) => {
         </div>
         
         <div className="loc-map-container">
-          <MapContainer 
-            center={position || [20.5937, 78.9629]} // Default to India roughly
-            zoom={position ? 15 : 4} 
-            style={{ height: '350px', width: '100%', borderRadius: '8px' }}
-          >
-            <TileLayer
-              attribution='&copy; OpenStreetMap contributors'
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-            {position && <MapCenterer center={position} />}
-            <LocationMarker position={position} setPosition={setPosition} />
-          </MapContainer>
+          {isLocating ? (
+            <div style={{ height: '350px', width: '100%', borderRadius: '8px', background: '#f4f9f1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', border: '1px dashed #d4e8cc' }}>
+              <i className="fas fa-spinner fa-spin" style={{ fontSize: '2.5rem', color: '#2d7318', marginBottom: '1rem' }}></i>
+              <span style={{ color: '#4a5c43', fontWeight: 600 }}>Acquiring GPS Signal...</span>
+              <span style={{ color: '#728c66', fontSize: '0.8rem', marginTop: '0.5rem' }}>Please allow location access if prompted</span>
+            </div>
+          ) : (
+            <MapErrorBoundary>
+              <MapContainer 
+                center={position} 
+                zoom={15} 
+                style={{ height: '350px', width: '100%', borderRadius: '8px' }}
+              >
+                <TileLayer
+                  attribution='&copy; OpenStreetMap'
+                  url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                />
+                <MapSizeFixer />
+                {position && <MapCenterer center={position} />}
+                <LocationMarker position={position} setPosition={setPosition} />
+              </MapContainer>
+            </MapErrorBoundary>
+          )}
         </div>
 
         <div className="loc-modal-footer">

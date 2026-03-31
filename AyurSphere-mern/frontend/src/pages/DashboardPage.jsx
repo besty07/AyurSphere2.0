@@ -19,8 +19,10 @@ const DashboardPage = ({ user, onUserChange }) => {
   const [cartOpen, setCartOpen] = useState(false);
   const navigate = useNavigate();
 
+  const isProfileComplete = Boolean(user?.mobile && user?.email && user?.address);
+
   const isFavorite = (plantId) => favorites.some((fav) => (fav._id || fav.id) === plantId);
-  const cartCount = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
+  const cartCount = cart?.items?.filter(i => i.product).length || 0;
 
   const fetchPlants = async () => {
     const data = await request('/plants');
@@ -217,6 +219,14 @@ const DashboardPage = ({ user, onUserChange }) => {
           <button className="header-logout-btn" onClick={logout}>Logout</button>
         </div>
       </header>
+
+      {!isProfileComplete && (
+        <div className="profile-warning-banner" onClick={() => navigate('/profile')}>
+          <i className="fas fa-exclamation-triangle" /> 
+          <span>Your profile is incomplete! Adding your Email, Mobile, and Address unlocks seamless Checkout.</span>
+          <span className="pwd-link">Complete Now <i className="fas fa-arrow-right"/></span>
+        </div>
+      )}
 
       {/* ── BODY ── */}
       <div className="main-layout">

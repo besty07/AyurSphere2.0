@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { request, clearSession, setSession, getToken } from '../api/client.js';
 import LocationPickerModal from '../components/LocationPickerModal.jsx';
 import '../styles/userProfile.css';
+import '../styles/checkout.css';
 
 const UserProfilePage = ({ user, onUserChange }) => {
   const navigate = useNavigate();
@@ -12,6 +13,9 @@ const UserProfilePage = ({ user, onUserChange }) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState('');
   const [isMapOpen, setIsMapOpen] = useState(false);
+  
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otp, setOtp] = useState('');
   
   const [formData, setFormData] = useState({
     email: '',
@@ -71,12 +75,30 @@ const UserProfilePage = ({ user, onUserChange }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
+  const handleSubmit = async (e, bypassOtp = false, verifiedOtp = '') => {
+    if (e) e.preventDefault();
     setError(null);
     setSuccess('');
 
+    // If typing new password and haven't entered OTP yet
+    if (formData.password && !bypassOtp) {
+      if (!formData.mobile) {
+        setError("Please enter a mobile number first to receive your secure OTP.");
+        return;
+      }
+      try {
+        setSaving(true);
+        await request('/users/send-otp', { method: 'POST' });
+        setShowOtpModal(true);
+      } catch (err) {
+        setError(err.message || 'Failed to dispatch OTP.');
+      } finally {
+        setSaving(false); // Wait for modal input
+      }
+      return;
+    }
+
+    setSaving(true);
     try {
       const data = new FormData();
       if (formData.email) data.append('email', formData.email);
@@ -85,7 +107,10 @@ const UserProfilePage = ({ user, onUserChange }) => {
       if (formData.gender) data.append('gender', formData.gender);
       if (formData.address) data.append('address', formData.address);
       if (formData.medicalHistory) data.append('medicalHistory', formData.medicalHistory);
-      if (formData.password) data.append('password', formData.password);
+      if (formData.password) {
+        data.append('password', formData.password);
+        data.append('otp', verifiedOtp);
+      }
       if (profilePic) data.append('profilePicture', profilePic);
 
       const updatedUser = await request('/users/profile', {
@@ -99,12 +124,21 @@ const UserProfilePage = ({ user, onUserChange }) => {
       
       setSuccess('Profile updated successfully!');
       setFormData(prev => ({ ...prev, password: '' })); // clear password field
+      setOtp('');
+      setShowOtpModal(false);
+      setSuccess('Profile updated successfully!');
       
     } catch (err) {
       setError(err.message || 'Error updating profile');
     } finally {
       setSaving(false);
     }
+  };
+
+  const verifyOtpAndSubmit = () => {
+    if (!otp) return alert("Please enter the OTP.");
+    setShowOtpModal(false);
+    handleSubmit(null, true, otp);
   };
 
   const logout = () => {
@@ -251,6 +285,31 @@ const UserProfilePage = ({ user, onUserChange }) => {
         onClose={() => setIsMapOpen(false)} 
         onConfirm={(addr) => setFormData(prev => ({ ...prev, address: addr }))} 
       />
+
+      {/* ── OTP Modal ── */}
+      {showOtpModal && (
+        <div className="loc-modal-overlay">
+          <div className="loc-modal-content" style={{ maxWidth: '400px', padding: '2rem', textAlign: 'center' }}>
+            <h3 style={{ color: '#2d7318', marginBottom: '1rem' }}><i className="fas fa-lock" /> Security Verification</h3>
+            <p style={{ color: '#4a5c43', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              We've dispatched a 6-digit verification code to your registered mobile number: <br/><strong>{formData.mobile}</strong>
+            </p>
+            <input 
+              type="text" 
+              maxLength="6"
+              style={{ padding: '0.75rem', width: '100%', borderRadius: '8px', border: '1.5px solid #d4e8cc', textAlign: 'center', fontSize: '1.5rem', letterSpacing: '8px', marginBottom: '1.5rem' }} 
+              placeholder="------"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
+            />
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button className="loc-btn loc-btn-current" style={{ flex: 1 }} onClick={() => setShowOtpModal(false)}>Cancel</button>
+              <button className="loc-btn loc-btn-confirm" style={{ flex: 1 }} onClick={verifyOtpAndSubmit} disabled={otp.length < 5}>Verify & Save</button>
+            </div>
+            <p style={{ fontSize: '0.75rem', color: '#728c66', marginTop: '1rem' }}>Demo Hint: Try OTP 123456</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
