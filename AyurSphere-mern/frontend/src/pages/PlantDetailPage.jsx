@@ -43,6 +43,10 @@ const PlantDetailPage = ({ user, onUserChange }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [isFavorite, setIsFavorite] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [products, setProducts] = useState([]);
+  const [productQty, setProductQty] = useState({});
+  const [addingToCart, setAddingToCart] = useState({});
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     const fetchPlant = async () => {
@@ -54,6 +58,13 @@ const PlantDetailPage = ({ user, onUserChange }) => {
           const favIds = favs.map(f => f._id || f.id);
           setIsFavorite(favIds.includes(data._id || data.id));
         } catch (_) {}
+        try {
+          const prods = await request(`/products?plantId=${data._id || data.id}`);
+          setProducts(prods);
+          const initQty = {};
+          prods.forEach(p => { initQty[p._id] = 1; });
+          setProductQty(initQty);
+        } catch (_) {}
       } catch (err) {
         setError(err.message || 'Failed to load plant');
       } finally {
@@ -63,6 +74,11 @@ const PlantDetailPage = ({ user, onUserChange }) => {
     fetchPlant();
     window.scrollTo(0, 0);
   }, [id]);
+
+  const showToast = (msg, type = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 2800);
+  };
 
   const toggleFavorite = async () => {
     if (!plant) return;
@@ -77,6 +93,26 @@ const PlantDetailPage = ({ user, onUserChange }) => {
     } catch (err) {
       console.error('Fav toggle error', err);
     }
+  };
+
+  const handleAddToCart = async (productId) => {
+    const qty = productQty[productId] || 1;
+    setAddingToCart(prev => ({ ...prev, [productId]: true }));
+    try {
+      await request('/cart/add', { method: 'POST', body: { productId, quantity: qty } });
+      showToast('Added to cart!');
+    } catch (err) {
+      showToast('Failed to add to cart', 'error');
+    } finally {
+      setAddingToCart(prev => ({ ...prev, [productId]: false }));
+    }
+  };
+
+  const changeQty = (productId, delta) => {
+    setProductQty(prev => ({
+      ...prev,
+      [productId]: Math.max(1, (prev[productId] || 1) + delta),
+    }));
   };
 
   if (loading) {
@@ -118,6 +154,7 @@ const PlantDetailPage = ({ user, onUserChange }) => {
     { id: 'overview',   label: 'Overview',      icon: 'fas fa-info-circle' },
     { id: 'properties', label: 'Properties',     icon: 'fas fa-flask' },
     { id: 'usage',      label: 'How to Use',     icon: 'fas fa-hand-holding-medical' },
+    { id: 'products',   label: 'Buy Products',   icon: 'fas fa-shopping-bag' },
   ];
 
   return (
@@ -141,6 +178,14 @@ const PlantDetailPage = ({ user, onUserChange }) => {
           </button>
         </div>
       </nav>
+
+      {/* ── TOAST ── */}
+      {toast && (
+        <div className={`pd-toast ${toast.type === 'error' ? 'pd-toast--error' : 'pd-toast--success'}`}>
+          <i className={toast.type === 'error' ? 'fas fa-exclamation-circle' : 'fas fa-check-circle'} />
+          {toast.msg}
+        </div>
+      )}
 
       {/* ── HERO SECTION ── */}
       <section className="pd-hero">
@@ -445,6 +490,71 @@ const PlantDetailPage = ({ user, onUserChange }) => {
                     with promising results in modern pharmacological investigations.
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* ═══════════ PRODUCTS TAB ═══════════ */}
+        {activeTab === 'products' && (
+          <div className="pd-tab-panel pd-animate-in">
+            <div className="pd-card pd-card--full">
+              <div className="pd-card-header">
+                <div className="pd-card-icon" style={{ background: 'linear-gradient(135deg, #2d7318, #4a9c28)' }}>
+                  <i className="fas fa-shopping-bag" />
+                </div>
+                <h3>Available Products – {plant.plantName}</h3>
+              </div>
+              <div className="pd-card-body">
+                {products.length === 0 ? (
+                  <div className="pd-products-empty">
+                    <i className="fas fa-box-open" />
+                    <p>No products available for this plant yet.</p>
+                  </div>
+                ) : (
+                  <div className="pd-products-grid">
+                    {products.map((product) => (
+                      <div key={product._id} className="pd-product-card">
+                        <div className="pd-product-img">
+                          <img
+                            src={product.image || product.plantId?.imagePath || normalizeImagePath(plant.imagePath)}
+                            alt={product.name}
+                            onError={(e) => (e.currentTarget.src = '/images/default-plant.svg')}
+                          />
+                          <span className="pd-product-type-badge">{product.type}</span>
+                        </div>
+                        <div className="pd-product-info">
+                          <h4 className="pd-product-name">{product.name}</h4>
+                          <p className="pd-product-desc">{product.description}</p>
+                          <p className="pd-product-price">₹{product.price}</p>
+                          <div className="pd-product-actions">
+                            <div className="pd-product-qty">
+                              <button
+                                className="pd-qty-btn"
+                                onClick={() => changeQty(product._id, -1)}
+                                aria-label="Decrease"
+                              >−</button>
+                              <span className="pd-qty-val">{productQty[product._id] || 1}</span>
+                              <button
+                                className="pd-qty-btn"
+                                onClick={() => changeQty(product._id, 1)}
+                                aria-label="Increase"
+                              >+</button>
+                            </div>
+                            <button
+                              className={`pd-add-cart-btn ${addingToCart[product._id] ? 'pd-add-cart-btn--loading' : ''}`}
+                              onClick={() => handleAddToCart(product._id)}
+                              disabled={addingToCart[product._id]}
+                            >
+                              {addingToCart[product._id]
+                                ? <><i className="fas fa-spinner fa-spin" /> Adding...</>
+                                : <><i className="fas fa-cart-plus" /> Add to Cart</>}
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
