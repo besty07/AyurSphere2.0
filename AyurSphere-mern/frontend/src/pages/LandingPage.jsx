@@ -270,9 +270,6 @@ const LandingPage = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.9, duration: 0.6 }}
           >
-            <button className="cta-button" onClick={enterSphere}>
-              🌿 Enter AyurSphere
-            </button>
           </motion.div>
         </motion.div>
         <ScrollIndicator />
@@ -395,7 +392,7 @@ const LandingPage = () => {
             whileTap={{ scale: 0.97 }}
           >
             <button className="cta-button cta-final-button" onClick={enterSphere}>
-              🌿 Enter AyurSphere
+              Enter AyurSphere
             </button>
           </motion.div>
         </AnimatedSection>
