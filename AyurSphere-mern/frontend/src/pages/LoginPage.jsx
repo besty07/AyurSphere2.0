@@ -21,7 +21,7 @@ const LoginPage = ({ onAuth }) => {
       const data = await request('/auth/login', { method: 'POST', body: { username, password } });
       setSession(data);
       onAuth(data.user);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setMessage(err.message);
     }
