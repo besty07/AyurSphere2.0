@@ -20,6 +20,20 @@ const DashboardPage = ({ user, onUserChange }) => {
   const navigate = useNavigate();
 
   const isFavorite = (plantId) => favorites.some((fav) => (fav._id || fav.id) === plantId);
+
+  const plantOfTheDay = useMemo(() => {
+    if (!plants || plants.length === 0) return null;
+    const index = new Date().getDate() % plants.length;
+    return plants[index];
+  }, [plants]);
+
+  const handlePlantOfTheDayClick = () => {
+    if (!plantOfTheDay) return;
+    const plantId = plantOfTheDay._id || plantOfTheDay.id;
+    if (!plantId) return;
+    navigate(`/plant/${plantId}`);
+  };
+
   const cartCount = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
 
   const fetchPlants = async () => {
@@ -171,6 +185,140 @@ const DashboardPage = ({ user, onUserChange }) => {
           to { opacity: 1; transform: scale(1); }
         }
 
+        .section-top {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 1rem;
+          flex-wrap: wrap;
+        }
+
+        .plant-of-day-card {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 6px 10px;
+          border-radius: 8px;
+          background: #eef9ee;
+          border: 1px solid #cbe4cc;
+          font-size: 0.95rem;
+          line-height: 1.3;
+          color: #1a4b26;
+          cursor: pointer;
+          transition: background-color 0.12s ease, transform 0.12s ease;
+          max-height: 34px;
+          height: min-content;
+          margin-bottom: 0.5rem;
+        }
+
+        .plant-of-day-card:hover {
+          background-color: #dff3dd;
+          text-decoration: underline;
+          transform: translateY(-1px);
+        }
+
+        .plant-of-day-card .pod-title {
+          font-weight: 600;
+          margin-right: 4px;
+        }
+
+        .plant-of-day-card .pod-plant-name {
+          font-weight: 700;
+        }
+
+        .plant-of-day-card .pod-scientific {
+          font-style: italic;
+          color: #3f6e53;
+        }
+
+        /* remove old image rules */
+        .plant-of-day-card img {
+          display: none;
+        }
+          margin-bottom: 10px;
+        }
+
+        .pod-label {
+          font-weight: 700;
+          margin-bottom: 8px;
+          color: #1d6b2b;
+          width: 100%;
+          text-align: left;
+        }
+
+        .pod-text h4 {
+          margin: 0;
+          font-size: 1.05rem;
+          line-height: 1.3;
+        }
+
+        .pod-text p {
+          margin: 4px 0 0;
+          color: #3c3c3c;
+          font-style: italic;
+        }
+
+        .pod-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.45);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 999;
+          padding: 16px;
+        }
+
+        .pod-modal {
+          max-width: 400px;
+          width: 100%;
+          background: #ffffff;
+          border-radius: 12px;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.25);
+          padding: 18px;
+          position: relative;
+          text-align: center;
+        }
+
+        .pod-modal-close {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          border: none;
+          background: transparent;
+          color: #777;
+          font-size: 1.1rem;
+          cursor: pointer;
+        }
+
+        .pod-modal img {
+          width: 100%;
+          height: 180px;
+          object-fit: cover;
+          border-radius: 8px;
+          margin-bottom: 12px;
+        }
+
+        .pod-modal h3 {
+          margin: 0 0 8px;
+        }
+
+        .pod-modal-scientific {
+          margin: 4px 0 12px;
+          font-weight: 600;
+          color: #3d6d4a;
+        }
+
+        .pod-modal-action {
+          border: none;
+          padding: 8px 16px;
+          border-radius: 8px;
+          background: #2c7d34;
+          color: #fff;
+          cursor: pointer;
+          margin-top: 10px;
+        }
+
         @media (max-width: 760px) {
           .modal-card {
             grid-template-columns: 1fr !important;
@@ -179,6 +327,15 @@ const DashboardPage = ({ user, onUserChange }) => {
 
           .modal-image-wrapper {
             max-height: 260px !important;
+          }
+
+          .section-top {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .plant-of-day-card {
+            width: 100%;
           }
         }
       `}</style>
@@ -285,10 +442,23 @@ const DashboardPage = ({ user, onUserChange }) => {
             </div>
           </section>
 
-          {/* Section heading */}
-          <div className="section-heading">
-            <h3>Featured Medicinal Plants</h3>
-            <p>Discover these powerful healing plants from ancient Ayurvedic traditions</p>
+          <div className="section-top">
+            <div className="section-heading">
+              <h3>Featured Medicinal Plants</h3>
+              <p>Discover these powerful healing plants from ancient Ayurvedic traditions</p>
+            </div>
+
+            {activeSidebar === 'browse' && plantOfTheDay && (
+              <button
+                className="plant-of-day-card"
+                onClick={handlePlantOfTheDayClick}
+                type="button"
+              >
+                <span className="pod-title">🌿 Plant of the Day:</span>
+                <span className="pod-plant-name">{plantOfTheDay.plantName}</span>
+                <span className="pod-scientific">({plantOfTheDay.scientificName || 'Unknown'})</span>
+              </button>
+            )}
           </div>
 
           {/* Plants grid */}
