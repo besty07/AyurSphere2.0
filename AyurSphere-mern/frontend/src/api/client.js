@@ -1,17 +1,21 @@
 const API_BASE = '/api';
 
-const getToken = () => localStorage.getItem('token');
+export const getToken = () => localStorage.getItem('token');
 
 export const request = async (path, { method = 'GET', body, headers = {} } = {}) => {
   const token = getToken();
+  const isFormData = body instanceof FormData;
+  
+  const customHeaders = {
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...headers,
+  };
+
   const response = await fetch(`${API_BASE}${path}`, {
     method,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...headers,
-    },
-    body: body ? JSON.stringify(body) : undefined,
+    headers: customHeaders,
+    body: isFormData ? body : (body ? JSON.stringify(body) : undefined),
   });
 
   if (!response.ok) {

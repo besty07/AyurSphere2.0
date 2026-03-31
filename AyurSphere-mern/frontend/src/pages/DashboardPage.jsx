@@ -126,8 +126,7 @@ const DashboardPage = ({ user, onUserChange }) => {
   };
 
   const handleCheckout = () => {
-    alert('Checkout coming soon! Your order total: ₹' +
-      (cart?.items || []).reduce((s, i) => s + (i.product?.price || 0) * i.quantity, 0));
+    navigate('/checkout');
   };
 
   const logout = () => {
@@ -342,7 +341,7 @@ const DashboardPage = ({ user, onUserChange }) => {
 
       {/* ── HEADER ── */}
       <header className="app-header">
-        <div className="header-logo">
+        <div className="header-logo" onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
           <img src="/images/logo-final.png" alt="AyurSphere" />
           <span className="header-brand">AyurSphere</span>
         </div>
@@ -371,7 +370,7 @@ const DashboardPage = ({ user, onUserChange }) => {
             )}
           </button>
 
-          <span className="header-username">{user?.username}</span>
+          <span className="header-username" onClick={() => navigate('/profile')} style={{cursor: 'pointer'}} title="Go to Profile">{user?.username}</span>
           <button className="header-logout-btn" onClick={logout}>Logout</button>
         </div>
       </header>

@@ -38,7 +38,7 @@ const FavoritesPage = ({ user, onUserChange }) => {
     <div className="dashboard-root">
       {/* ── HEADER ── */}
       <header className="app-header">
-        <div className="header-logo">
+        <div className="header-logo" onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
           <img src="/images/logo-final.png" alt="AyurSphere" />
           <span className="header-brand">AyurSphere</span>
         </div>
@@ -53,7 +53,7 @@ const FavoritesPage = ({ user, onUserChange }) => {
         </div>
 
         <div className="header-actions">
-          <button className="header-icon-btn" onClick={() => navigate('/')}>
+          <button className="header-icon-btn" onClick={() => navigate('/dashboard')}>
             <i className="fas fa-spa" />
           </button>
           <button className="header-icon-btn" onClick={() => navigate('/favorites')}>
@@ -65,7 +65,7 @@ const FavoritesPage = ({ user, onUserChange }) => {
           <button className="header-icon-btn">
             <i className="fas fa-shopping-cart" />
           </button>
-          <span className="header-username">{user?.username}</span>
+          <span className="header-username" onClick={() => navigate('/profile')} style={{cursor: 'pointer'}} title="Go to Profile">{user?.username}</span>
           <button className="header-logout-btn" onClick={logout}>Logout</button>
         </div>
       </header>
@@ -82,7 +82,7 @@ const FavoritesPage = ({ user, onUserChange }) => {
             <i className="fas fa-heart-broken" />
             <h3>No favorites yet</h3>
             <p>Start adding plants by tapping the heart icon on any plant card.</p>
-            <Link to="/" className="browse-btn">
+            <Link to="/dashboard" className="browse-btn">
               <i className="fas fa-leaf" /> Browse Plants
             </Link>
           </div>
