@@ -25,7 +25,7 @@
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(8, 30, 6, 0.55);
+  background: rgba(0, 0, 0, 0.55);
   z-index: 1;
 }
 
@@ -70,6 +70,18 @@
   height: auto;
   border-radius: 12px;
   filter: drop-shadow(0 6px 14px rgba(0, 0, 0, 0.25));
+}
+
+.portal-brand-text {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-top: 0.2rem;
+  letter-spacing: -0.5px;
+  background: linear-gradient(to right, #a8e063, #1db954);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 .auth-portal-label {

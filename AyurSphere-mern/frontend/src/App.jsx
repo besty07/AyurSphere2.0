@@ -8,12 +8,21 @@ import FavoritesPage from './pages/FavoritesPage.jsx';
 import PlantDetailPage from './pages/PlantDetailPage.jsx';
 import UserProfilePage from './pages/UserProfilePage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
+import AdminDashboardPage from './pages/AdminDashboardPage.jsx';
 import { getUser } from './api/client.js';
 
 const ProtectedRoute = ({ children }) => {
   const user = getUser();
   if (!user) {
     return <Navigate to="/portal" replace />;
+  }
+  return children;
+};
+
+const AdminRoute = ({ children }) => {
+  const user = getUser();
+  if (!user || user.role !== 'admin') {
+    return <Navigate to="/dashboard" replace />;
   }
   return children;
 };
@@ -64,6 +73,14 @@ const App = () => {
           <ProtectedRoute>
             <CheckoutPage user={user} />
           </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminDashboardPage user={user} onUserChange={setUser} />
+          </AdminRoute>
         }
       />
       <Route path="*" element={<Navigate to="/portal" />} />

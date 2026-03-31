@@ -115,6 +115,25 @@ const PlantDetailPage = ({ user, onUserChange }) => {
     }));
   };
 
+  const handleShare = async () => {
+    const shareData = {
+      title: `AyurSphere: ${plant.plantName}`,
+      text: `Check out this medicinal plant on AyurSphere: ${plant.plantName} (${plant.scientificName}). ${plant.description}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Share failed', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="pd-root">
@@ -173,7 +192,7 @@ const PlantDetailPage = ({ user, onUserChange }) => {
           >
             <i className={`${isFavorite ? 'fas' : 'far'} fa-heart`} />
           </button>
-          <button className="pd-share-btn" title="Share">
+          <button className="pd-share-btn" title="Share" onClick={handleShare}>
             <i className="fas fa-share-alt" />
           </button>
         </div>

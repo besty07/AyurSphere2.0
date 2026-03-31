@@ -11,11 +11,14 @@ export const checkoutCart = async (req, res) => {
     // Fetch user's active cart to map items
     const cart = await Cart.findOne({ user: req.user.id }).populate('items.product');
     
-    if (!cart || cart.items.length === 0) {
-      return res.status(400).json({ message: 'Your cart is empty' });
+    // Auto-clean zombie products
+    const validItems = cart?.items?.filter(item => item.product) || [];
+
+    if (!cart || validItems.length === 0) {
+      return res.status(400).json({ message: 'Your cart is empty or only contains deleted products.' });
     }
 
-    const orderItems = cart.items.map(item => {
+    const orderItems = validItems.map(item => {
       const p = item.product;
       return {
         product: p._id,
@@ -48,5 +51,14 @@ export const getMyOrders = async (req, res) => {
     res.json(orders);
   } catch (error) {
     res.status(500).json({ message: 'Server error retrieving orders', error: error.message });
+  }
+};
+
+export const getAllOrders = async (req, res) => {
+  try {
+    const orders = await Order.find({}).populate('user', 'username email').sort({ createdAt: -1 });
+    res.json(orders);
+  } catch (error) {
+    res.status(500).json({ message: 'Server error retrieving all orders', error: error.message });
   }
 };

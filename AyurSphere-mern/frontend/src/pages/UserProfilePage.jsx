@@ -27,11 +27,15 @@ const UserProfilePage = ({ user, onUserChange }) => {
     password: '',
   });
   
+  const [orders, setOrders] = useState([]);
+  const [loadingOrders, setLoadingOrders] = useState(true);
+  
   const [profilePic, setProfilePic] = useState(null);
   const [picPreview, setPicPreview] = useState('/images/default-avatar.png');
 
   useEffect(() => {
     fetchProfile();
+    fetchOrders();
   }, []);
 
   const fetchProfile = async () => {
@@ -55,6 +59,18 @@ const UserProfilePage = ({ user, onUserChange }) => {
       setError(err.message || 'Failed to load profile');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      setLoadingOrders(true);
+      const data = await request('/orders/me');
+      setOrders(data);
+    } catch (err) {
+      console.error('Failed to load orders', err);
+    } finally {
+      setLoadingOrders(false);
     }
   };
 
@@ -275,6 +291,59 @@ const UserProfilePage = ({ user, onUserChange }) => {
                   </button>
                 </div>
               </form>
+            </div>
+          )}
+
+          {/* ── ORDER HISTORY PORTAL ── */}
+          {!loading && (
+            <div className="up-card" style={{ marginTop: '2rem' }}>
+              <h3 className="up-section-title" style={{ marginTop: 0 }}><i className="fas fa-box-open" /> Previously Placed Orders</h3>
+              {loadingOrders ? (
+                <div style={{ textAlign: 'center', color: '#728c66', padding: '1rem' }}>
+                  <i className="fas fa-spinner fa-spin" /> Fetching order history...
+                </div>
+              ) : orders.length === 0 ? (
+                <div style={{ textAlign: 'center', backgroundColor: '#f4f9f1', padding: '2rem', borderRadius: '8px', border: '1px dashed #cbe4cc' }}>
+                  <i className="fas fa-shopping-basket" style={{ fontSize: '2rem', color: '#8ba37f', marginBottom: '0.5rem' }} />
+                  <p style={{ color: '#4a5c43' }}>You have not placed any orders yet!</p>
+                </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {orders.map(order => (
+                    <div key={order._id} style={{ border: '1px solid #d4e8cc', borderRadius: '8px', padding: '1.2rem', backgroundColor: '#fcfdfc' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f0f5ee', paddingBottom: '0.8rem', marginBottom: '0.8rem' }}>
+                        <div>
+                          <strong style={{ color: '#2d7318', fontSize: '1.1rem' }}>Order #{order._id.substring(18).toUpperCase()}</strong>
+                          <p style={{ margin: 0, fontSize: '0.8rem', color: '#728c66' }}>{new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</p>
+                        </div>
+                        <div style={{ textAlign: 'right' }}>
+                          <span style={{ 
+                            padding: '4px 10px', 
+                            borderRadius: '12px', 
+                            fontSize: '0.75rem', 
+                            fontWeight: 'bold',
+                            backgroundColor: order.status === 'Pending' ? '#fff3cd' : '#d4edda',
+                            color: order.status === 'Pending' ? '#856404' : '#155724'
+                          }}>{order.status}</span>
+                          <p style={{ margin: '4px 0 0 0', fontWeight: 'bold', color: '#1b4d0c' }}>Total: ₹{order.totalAmount}</p>
+                        </div>
+                      </div>
+                      
+                      <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
+                        {order.items.map((item, idx) => (
+                          <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', minWidth: '150px', backgroundColor: '#f4f9f1', padding: '6px 10px', borderRadius: '6px' }}>
+                            <img src={item.image ? (item.image.startsWith('http') ? item.image : `http://localhost:4000${item.image}`) : '/images/default-plant.svg'} alt={item.name} style={{ width: '35px', height: '35px', objectFit: 'cover', borderRadius: '4px' }} onError={(e) => e.currentTarget.src='/images/default-plant.svg'} />
+                            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                              <span style={{ fontSize: '0.8rem', fontWeight: '600', color: '#4a5c43', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100px' }}>{item.name}</span>
+                              <span style={{ fontSize: '0.75rem', color: '#728c66' }}>Qty: {item.quantity}</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

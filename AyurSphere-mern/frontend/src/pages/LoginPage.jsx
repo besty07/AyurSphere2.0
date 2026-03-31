@@ -21,7 +21,11 @@ const LoginPage = ({ onAuth }) => {
       const data = await request('/auth/login', { method: 'POST', body: { username, password } });
       setSession(data);
       onAuth(data.user);
-      navigate('/dashboard');
+      if (data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setMessage(err.message);
     }
@@ -35,10 +39,14 @@ const LoginPage = ({ onAuth }) => {
       return;
     }
     try {
-      const data = await request('/auth/signup', { method: 'POST', body: { username, password } });
+      const data = await request('/auth/signup', { method: 'POST', body: { username, password, role } });
       setSession(data);
       onAuth(data.user);
-      navigate('/');
+      if (data.user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setMessage(err.message);
     }
@@ -48,7 +56,8 @@ const LoginPage = ({ onAuth }) => {
     <div className="auth-page">
       <div className="auth-card">
         <div className="logo-area">
-          <img src="/images/logo-final.png" alt="AyurSphere" />
+          <img src="/images/logo-final.png" alt="AyurSphere Logo" />
+          <h1 className="portal-brand-text">AyurSphere</h1>
           <h3 className="auth-portal-label">
             {isAdmin ? (
               <><i className="fas fa-user-shield" /> Administrator Access</>
