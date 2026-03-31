@@ -184,7 +184,7 @@ const DashboardPage = ({ user, onUserChange }) => {
 
       {/* ── HEADER ── */}
       <header className="app-header">
-        <div className="header-logo">
+        <div className="header-logo" onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>
           <img src="/images/logo-final.png" alt="AyurSphere" />
           <span className="header-brand">AyurSphere</span>
         </div>

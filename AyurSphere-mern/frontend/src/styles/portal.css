@@ -32,11 +32,11 @@
   z-index: 2;
   width: 100%;
   max-width: 460px;
-  background: rgba(195, 255, 180, 0.18);
-  border: 1px solid rgba(180, 255, 160, 0.25);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 28px;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   padding: 2.4rem 2.2rem 2rem;
   display: flex;
@@ -53,14 +53,12 @@
 
 .portal-logo {
   width: 100%;
-  background: linear-gradient(135deg, #a8ff78 0%, #78ffd6 50%, #a8ff78 100%);
   border-radius: 16px;
-  padding: 1rem;
+  padding: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
   margin-bottom: 0.4rem;
-  box-shadow: 0 8px 24px rgba(100, 200, 80, 0.3);
 }
 
 .portal-logo img {
@@ -71,7 +69,7 @@
 }
 
 .portal-tagline {
-  color: rgba(180, 255, 160, 0.9);
+  color: rgba(255, 255, 255, 0.9);
   font-style: italic;
   font-weight: 500;
   font-size: 0.95rem;
@@ -80,7 +78,7 @@
 }
 
 .portal-heading {
-  color: #0d1b08;
+  color: #ffffff;
   font-size: 1.75rem;
   font-weight: 800;
   letter-spacing: -0.5px;
@@ -88,7 +86,7 @@
 }
 
 .portal-subtext {
-  color: rgba(20, 50, 10, 0.8);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.9rem;
   font-weight: 500;
   margin-bottom: 0.6rem;
@@ -216,7 +214,7 @@
 }
 
 .portal-footer {
-  color: rgba(20, 60, 10, 0.75);
+  color: rgba(255, 255, 255, 0.75);
   font-size: 0.82rem;
   font-weight: 600;
   margin-top: 0.8rem;
@@ -227,5 +225,5 @@
 }
 
 .portal-footer i {
-  color: #4a7c2c;
+  color: #a8e063;
 }
