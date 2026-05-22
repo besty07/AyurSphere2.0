@@ -16,19 +16,9 @@ const DashboardPage = ({ user, onUserChange }) => {
   const [activeSidebar, setActiveSidebar] = useState('browse');
   const [loading, setLoading] = useState(true);
   const [showAddPlant, setShowAddPlant] = useState(false);
-  const [showGardenModal, setShowGardenModal] = useState(false);
   const [cart, setCart] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
   const navigate = useNavigate();
-
-  const openGardenModal = () => {
-    setActiveSidebar('garden');
-    setShowGardenModal(true);
-  };
-
-  const closeGardenModal = () => {
-    setShowGardenModal(false);
-  };
 
   const plantOfTheDay = useMemo(() => {
     if (!plants || plants.length === 0) return null;
@@ -140,17 +130,6 @@ const DashboardPage = ({ user, onUserChange }) => {
   const handleCheckout = () => {
     navigate('/checkout');
   };
-
-  useEffect(() => {
-    const onEscape = (event) => {
-      if (event.key === 'Escape' && showGardenModal) {
-        setShowGardenModal(false);
-      }
-    };
-
-    window.addEventListener('keydown', onEscape);
-    return () => window.removeEventListener('keydown', onEscape);
-  }, [showGardenModal]);
 
   const logout = () => {
     clearSession();
@@ -286,7 +265,7 @@ const DashboardPage = ({ user, onUserChange }) => {
           font-style: italic;
         }
 
-        .pod-modal-overlay, .garden-modal-overlay {
+        .pod-modal-overlay {
           position: fixed;
           inset: 0;
           background: rgba(0, 0, 0, 0.45);
@@ -298,7 +277,7 @@ const DashboardPage = ({ user, onUserChange }) => {
           animation: modal-fade 180ms ease;
         }
 
-        .pod-modal, .garden-modal {
+        .pod-modal {
           max-width: 400px;
           width: 100%;
           background: #ffffff;
@@ -308,35 +287,6 @@ const DashboardPage = ({ user, onUserChange }) => {
           position: relative;
           text-align: center;
           animation: modal-scale 170ms ease;
-        }
-
-        .garden-modal-icon {
-          font-size: 2rem;
-          margin-bottom: 8px;
-        }
-
-        .garden-modal h3 {
-          margin: 0;
-          font-size: 1.25rem;
-          margin-bottom: 8px;
-        }
-
-        .garden-modal p {
-          margin: 0;
-          color: #3f5a3a;
-          font-weight: 500;
-        }
-
-        .pod-modal-close, .garden-modal-close {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          border: none;
-          background: transparent;
-          color: #555;
-          font-size: 1.25rem;
-          cursor: pointer;
-          padding: 4px;
         }
 
         .pod-modal-close {
@@ -470,13 +420,6 @@ const DashboardPage = ({ user, onUserChange }) => {
                 <i className="far fa-heart" />
                 <span>My Favorites</span>
               </li>
-              <li
-                className={`sidebar-item ${activeSidebar === 'garden' ? 'sidebar-item--active' : ''}`}
-                onClick={openGardenModal}
-              >
-                <i className="fas fa-map-marker-alt" />
-                <span>Virtual Garden</span>
-              </li>
             </ul>
           </div>
 
@@ -559,20 +502,6 @@ const DashboardPage = ({ user, onUserChange }) => {
           )}
         </main>
       </div>
-
-      {/* Virtual Garden Modal */}
-      {showGardenModal && (
-        <div className="garden-modal-overlay" onClick={closeGardenModal}>
-          <div className="garden-modal" onClick={(e) => e.stopPropagation()}>
-            <button className="garden-modal-close" onClick={closeGardenModal}>
-              ×
-            </button>
-            <div className="garden-modal-icon" aria-hidden="true">🌿</div>
-            <h3>🌱 Virtual Garden</h3>
-            <p>This feature is coming soon</p>
-          </div>
-        </div>
-      )}
 
       {/* Add Plant Modal */}
       <AddPlantModal
