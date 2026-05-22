@@ -68,16 +68,18 @@ const LoginPage = ({ onAuth }) => {
           <p>The sphere of healing, reimagined</p>
         </div>
 
-        <div className="toggle">
-          <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>
-            Login
-          </button>
-          <button className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')}>
-            Create account
-          </button>
-        </div>
+        {!isAdmin && (
+          <div className="toggle">
+            <button className={mode === 'login' ? 'active' : ''} onClick={() => setMode('login')}>
+              Login
+            </button>
+            <button className={mode === 'signup' ? 'active' : ''} onClick={() => setMode('signup')}>
+              Create account
+            </button>
+          </div>
+        )}
 
-        {mode === 'login' ? (
+        {(mode === 'login' || isAdmin) ? (
           <form className="auth-form" onSubmit={submitLogin}>
             <label>
               Username
